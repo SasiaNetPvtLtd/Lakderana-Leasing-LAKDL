@@ -1,0 +1,787 @@
+// DEVELOP BY : MAHELA FOR OFSCL LEASING    DATE:21-09-2006
+
+import java.io.*; 
+import javax.servlet.*;   
+import javax.servlet.http.*; 
+import java.sql.*; 
+import java.util.*; 
+
+
+public class LAKDL_AF_RE_new_receipt_report extends javax.servlet.http.HttpServlet { 
+	
+	
+	
+	public  void service(HttpServletRequest req, HttpServletResponse res)  throws IOException { 
+		
+		ServletOutputStream out = null;
+		Connection conn=null;
+		Statement stmt=null;
+		Statement stmt1=null;
+		Statement stmt2=null;
+		Statement stmt3=null;
+		Statement stmt4=null;
+		Statement stmt5=null;
+		Statement stmt6=null;
+		
+		java.text.NumberFormat nf,nf1;
+		ResultSet rs=null;
+		ResultSet rs1=null;
+		ResultSet rs2=null;
+		ResultSet rs3=null;
+		ResultSet rs4=null;
+		ResultSet rs5=null;
+		ResultSet rs6=null;
+		ResultSet rs7=null;
+		
+		
+		String m_chksql=null;
+		
+		try { 
+			
+			LAKDL_AF_CO_conn_methods m_sn_methods = new LAKDL_AF_CO_conn_methods(); 
+			String m_html_client_url=m_sn_methods.html_client_url.trim(); 
+			String m_schema_name = m_sn_methods.schema_name;
+			String m_class_url=m_sn_methods.servlet_client_url.trim()+":"+m_sn_methods.client_t3_port.trim(); 
+			String m_fschema_name=m_sn_methods.client_name.trim();
+			String m_header_name=m_sn_methods.header_name.trim();
+			
+			
+			
+			nf = java.text.NumberFormat.getInstance(Locale.US);
+			nf.setMinimumFractionDigits(2);
+			nf.setMaximumFractionDigits(2); 
+			nf1 = java.text.NumberFormat.getInstance(Locale.US);
+			nf1.setMinimumFractionDigits(0);
+			nf1.setMaximumFractionDigits(0);   
+			res.setStatus(HttpServletResponse.SC_OK); 
+			res.setContentType("text/html"); 
+			m_chksql=req.getParameter("chksql");
+			out = res.getOutputStream(); 
+			conn = m_sn_methods.met_user_validate(req); 
+			stmt=conn.createStatement();
+			stmt1=conn.createStatement();
+			stmt2=conn.createStatement(); 
+			stmt3=conn.createStatement(); 	
+			String m_username 	= m_sn_methods.username;
+			
+			if(m_chksql.equals("main_page")){
+				
+				out.println("<HTML>"); 
+				out.println("<HEAD>"); 
+				out.println("<TITLE>Collection - Receipt Report </TITLE>"); 
+				out.println("</HEAD>"); 
+				out.println("<link REL='STYLESHEET' HREF='"+m_html_client_url+"/css/Asset_Financing_System.css' TYPE=\"text/css\">"); 
+				out.println("<SCRIPT language=\"JavaScript\">"); 
+				
+				out.println("var m_sav_msg='';");
+				out.println("function get_vector(data_vec) {");
+				out.println("	  if(data_vec.length>0 && document.Form1.hid_option.value==\"1\"){");
+				out.println("			document.Form1.TXT_FROM_DATE_DD.value=data_vec[0];");
+				out.println("			document.Form1.TXT_FROM_DATE_MM.value=data_vec[1];");
+				out.println("			document.Form1.TXT_FROM_DATE_YY.value=data_vec[2];");
+				out.println("			document.Form1.TXT_TO_DATE_DD.value=data_vec[0];");
+				out.println("			document.Form1.TXT_TO_DATE_MM.value=data_vec[1];");
+				out.println("			document.Form1.TXT_TO_DATE_YY.value=data_vec[2];");
+				out.println("		}");
+				out.println("}");
+				
+				//To validate from date & to date
+				out.println("function validate_date(){");
+				out.println(" 	m_from_dd = document.Form1.TXT_FROM_DATE_DD.value ");
+				out.println(" 	m_from_mm = document.Form1.TXT_FROM_DATE_MM.value ");
+				out.println("		m_from_yy = document.Form1.TXT_FROM_DATE_YY.value ");
+				out.println(" 	m_to_dd = document.Form1.TXT_TO_DATE_DD.value ");
+				out.println(" 	m_to_mm = document.Form1.TXT_TO_DATE_MM.value ");
+				out.println(" 	m_to_yy = document.Form1.TXT_TO_DATE_YY.value ");
+				out.println(" if(m_from_dd != '' && m_from_mm !='' && m_from_yy !=''  ) { ");
+				out.println("    if(!checkMonthLength(document.Form1.TXT_FROM_DATE_DD,document.Form1.TXT_FROM_DATE_MM,document.Form1.TXT_FROM_DATE_YY)){  "); 
+				out.println("     return false;"); 
+				out.println("     }");
+				out.println("    else {");
+				out.println(" 	  if(m_to_dd != '' && m_to_mm !='' && m_to_yy !=''  ) { ");
+				out.println("  	     if(checkMonthLength(document.Form1.TXT_TO_DATE_DD,document.Form1.TXT_TO_DATE_MM,document.Form1.TXT_TO_DATE_YY)){  "); 
+				out.println("      	  return true;"); 
+				out.println("  	  	 }");
+				out.println("        else "); 
+				out.println("         return false; "); 
+				out.println("     }");
+				out.println("			else {");
+				out.println("   		alert('To Date cannot be null ')");
+				out.println("   		return false;"); 
+				out.println("     }");
+				out.println("    }");
+				out.println("  }");
+				out.println(" else { ");
+				out.println("   alert('From Date cannot be null ')");
+				out.println("   return false;"); 
+				out.println("  }");
+				out.println(" }");
+				
+				out.println("function makeRequest_detail() {");
+				out.println(" 	m_from_dd = document.Form1.TXT_FROM_DATE_DD.value ");
+				out.println(" 	m_from_mm = document.Form1.TXT_FROM_DATE_MM.value ");
+				out.println("		m_from_yy = document.Form1.TXT_FROM_DATE_YY.value ");
+				out.println(" 	m_from_date = m_from_dd+\"-\"+m_from_mm+\"-\"+m_from_yy; ");
+				out.println(" 	m_to_dd = document.Form1.TXT_TO_DATE_DD.value ");
+				out.println(" 	m_to_mm = document.Form1.TXT_TO_DATE_MM.value ");
+				out.println(" 	m_to_yy = document.Form1.TXT_TO_DATE_YY.value ");
+				out.println(" 	m_to_date = m_to_dd+\"-\"+m_to_mm+\"-\"+m_to_yy; ");
+				out.println("		if(validate_date()) {");
+				out.println("		 m_url=\""+m_class_url+"/"+m_fschema_name+"AF_RE_receipt_report?chksql=load_receipts&from_date=\"+m_from_date+\"&to_date=\"+m_to_date+\"&order_by=ENT_USER,ENT_DATE&sort_by=ASC\";");
+				out.println("    popupwin=window.open(m_url,'displayWindow1','left=90,top=110,width=900,height=450,toolbar=0,location=0,center:yes,direction=0,menuBar=1,status=0,scrollbars=1,resizable=1,fullscreen=1');");
+				out.println("   }");
+				out.println("}");
+				
+				//End by Dineth on 16-06-2009
+				out.println("function get_vector_normal(m_data){");
+				out.println("		invoice_detail_data.innerHTML=m_data;");
+				out.println("}");
+				
+				out.println("function validate_data(){"); 
+				out.println("	return true;"); 
+				out.println("}"); 			
+				
+				out.println("function before_submit(){ "); 
+				out.println("} "); 
+				
+				out.println("function load_lock(){	"); 
+				//out.println("document.oncontextmenu=new Function(\"return false\");"); 
+				out.println("}	"); 
+				
+				out.println("function clear_window(){	"); 
+				out.println("		if(confirm(\"Are you sure you want to clear the screen ?\")){ "); 
+				out.println("		window.location.href='"+m_class_url+"/"+m_fschema_name+"AF_RE_receipt_report?chksql=main_page';"); 
+				out.println("		}"); 
+				out.println("}"); 
+				
+				out.println("function new_window(){	"); 
+				out.println("	window.location.href='"+m_class_url+"/"+m_fschema_name+"AF_RE_receipt_reportchksql=main_page';"); 
+				out.println("}"); 
+				
+				out.println("function save_window(){	"); 
+				out.println("	before_submit();"); 
+				out.println("}"); 
+				
+				out.println("function load_help_msg() {"); 
+				out.println("    m_help_message = \"m_help_msg_LAKDL_FA_OP_CLIENT_STATEMENT_REPORT\";"); 
+				out.println("    HelpBox_msg(m_help_message);"); 
+				out.println("}"); 	
+				
+				out.println("function HelpBox_msg(m_help_message) {"); 
+				out.println("		popupwin = window.showModalDialog(servlet_client_url+\":\"+client_t3_port+\"/\"+client_name+\"AF_MAS_Help_Msg_Servlet?class_in=\"+client_name+\"FA_MAS_Help_Msg_select\"+"); 
+				out.println("  \"&help_message_in=\"+m_help_message);"); 
+				out.println("}"); 
+				
+				out.println("function load_roll_value(m_val){"); 
+				out.println("	help_box.innerHTML=\" Collection - Receipt Report - \"+m_val;"); 
+				out.println("}"); 
+				
+				out.println("function load_roll_out_value(){");
+				out.println("	help_box.innerHTML=\" Collection - Receipt Report \";"); 
+				out.println("}"); 
+				
+				out.println("function get_system_date() {");
+				out.println("	  document.Form1.hid_option.value=\"1\";");
+				out.println("		m_url=\""+m_class_url+"/"+m_fschema_name+"FA_CR_sql_validations?chksql=get_sys_date\";");
+				out.println("		load_interface(m_url,'XML');");
+				out.println("}");
+				
+				out.println("function load_screen_status(m_val){"); 
+				out.println("		if(m_val==\"NEW\"){"); 
+				out.println("			new_window();"); 
+				out.println("		}"); 
+				out.println("		else if(m_val==\"HELP\"){"); 
+				out.println("			load_help_msg();"); 
+				out.println("		}"); 
+				out.println("		document.Form1.SCREEN_NAME.value=m_val;"); 
+				out.println("		if(m_val==\"NEW\"){");
+				out.println("			document.Form1.hid_status.value=\"New\";"); 
+				out.println("		}");
+				out.println("		else if(m_val==\"EDIT\"){");  
+				out.println("			document.Form1.hid_status.value=\"Edit\";");  
+				out.println("		}");
+				out.println("		else if(m_val==\"DACT\"){");  
+				out.println("			document.Form1.hid_status.value=\"Deactivate\";");  
+				out.println("		}");
+				out.println("		else if(m_val==\"RACT\"){");  
+				out.println("			document.Form1.hid_status.value=\"Reactivate\";");  
+				out.println("		}");
+				out.println("		else{");  
+				out.println("			document.Form1.hid_status.value=\"\";");  
+				out.println("		}"); 
+				out.println("}"); 
+				
+				out.println("function get_display_msg(){"); 
+				out.println("	if(document.Form1.SCREEN_NAME.value==\"NEW\"){");
+				out.println("		m_sav_msg=\"Save\";"); 
+				out.println("	}");
+				out.println("	else if(document.Form1.SCREEN_NAME.value==\"EDIT\"){");  
+				out.println("		m_sav_msg=\"Modify\";");  
+				out.println("	}");
+				out.println("	else if(document.Form1.SCREEN_NAME.value==\"DACT\"){");  
+				out.println("		m_sav_msg=\"Deactivate\";");  
+				out.println("	}");
+				out.println("	else if(document.Form1.SCREEN_NAME.value==\"RACT\"){");  
+				out.println("		m_sav_msg=\"Reactivate\";");  
+				out.println("	}");
+				out.println("	else{");  
+				out.println("		m_sav_msg=\"\";");  
+				out.println("	}"); 
+				out.println("}"); 
+				
+				out.println("function MyDialog(){"); 
+				out.println("	this.valout   = new Array(10);"); 
+				out.println("}"); 
+				
+				out.println("function help_update() {"); 
+				out.println(" document.Form1.hid_help_type.value=\"1\";"); 
+				out.println(" m_sql = \"m_help_DIV_TXT_FACTOR_CLIENT_CHARGES_sql\";"); 
+				out.println(" m_criteria = document.Form1.TXT_CLIENT_CODE.value+\"@\";"); 
+				out.println(" HelpBox('1','10','0');"); 
+				out.println("}"); 
+				
+				out.println("function help_update_facility() {"); 
+				out.println(" 	document.Form1.hid_help_type.value=\"2\";"); 
+				out.println(" 	m_sql = \"m_help_DIV_TXT_FACILITY_CLIENT_CHARGES_sql\";"); 
+				out.println(" 	m_criteria = document.Form1.TXT_FACILITY_NO.value+\"@\"+document.Form1.TXT_CLIENT_CODE.value+\"@\";");
+				out.println(" 	HelpBox('1','10','0');"); 
+				out.println("}");
+				
+				out.println("function help_update_debtor() {"); 
+				out.println(" 	document.Form1.hid_help_type.value=\"3\";"); 
+				out.println(" 	m_sql = \"m_help_DIV_TXT_DEBTOR_REPORT_sql\";"); 
+				out.println(" 	m_criteria = document.Form1.TXT_DEBTOR_CODE.value+\"@\"+document.Form1.TXT_FACILITY_NO.value+\"@\"+document.Form1.TXT_CLIENT_CODE.value+\"@\";");
+				out.println(" 	HelpBox('1','10','0');"); 
+				out.println("}"); 
+				
+				out.println("function help_update_value_assign_1() {"); 
+				out.println("		document.Form1.TXT_CLIENT_CODE.value=oBj.valout[2];"); 
+				out.println("}");
+				
+				out.println("function help_update_value_assign_2() {"); 
+				out.println("		document.Form1.TXT_FACILITY_NO.value=oBj.valout[2];"); 
+				out.println("}");
+				
+				out.println("function help_update_value_assign_3() {"); 
+				out.println("		document.Form1.TXT_DEBTOR_CODE.value=oBj.valout[2];"); 
+				out.println("}");
+				
+				out.println("function HelpBox(Start,End,Hid_No,Max) {"); 
+				out.println("    oBj = new MyDialog();"); 
+				out.println("    oBj.valout[1]  = \" \";"); 
+				out.println("    oBj.valout[2]  = \" \";"); 
+				out.println("    oBj.valout[3]  = \" \";"); 
+				out.println("	"); 
+				out.println("	popupwin = window.showModalDialog(servlet_client_url+\":\"+client_t3_port+\"/\"+client_name+\"FA_MAS_Help_Servlet?class_in=\"+client_name+\"FA_OP_help_select\"+"); 
+				out.println("    \"&Sql_in=\"+m_sql+\"&Start_in=\"+Start+"); 
+				out.println("    \"&End_in=\"+End+\"&Crit_In=\"+m_criteria+"); 
+				out.println("    \"&Hid_No=\"+Hid_No, oBj,\"dialogWidth:25em; dialogHeight:18em; center:yes; status:no\");"); 
+				out.println("	"); 
+				out.println("	if(oBj.valout[1] !=\" \"){"); 
+				out.println("		if(oBj.valout[1] !=\"Close\"){"); 
+				out.println("			if(oBj.valout[1]!=\"Prev\"){"); 
+				out.println("				if(oBj.valout[1]!=\"Next\"){"); 
+				out.println("					if(document.Form1.hid_help_type.value==\"1\"){"); 
+				out.println("						help_update_value_assign_1();"); 
+				out.println("					}"); 
+				out.println("					if(document.Form1.hid_help_type.value==\"2\"){"); 
+				out.println("						help_update_value_assign_2();"); 
+				out.println("					}"); 
+				out.println("					if(document.Form1.hid_help_type.value==\"3\"){"); 
+				out.println("						help_update_value_assign_3();"); 
+				out.println("					}"); 
+				out.println("				}"); 
+				out.println("				else{"); 
+				out.println("					Next(oBj.valout[2],oBj.valout[3],Hid_No);"); 
+				out.println("					return false;"); 
+				out.println("				} "); 
+				out.println("			}"); 
+				out.println("			else{	"); 
+				out.println("				Prev(oBj.valout[2],oBj.valout[3],Hid_No);"); 
+				out.println("			}	"); 
+				out.println("	 	}"); 
+				out.println("	}"); 
+				out.println("}"); 
+				
+				out.println("function Prev(Start,End,Hid_No){"); 
+				out.println("		HelpBox(Start,End,Hid_No);"); 
+				out.println("}"); 
+				
+				out.println("function Next (Start,End,Hid_No){"); 
+				out.println("		HelpBox(Start,End,Hid_No);"); 
+				out.println("}"); 
+				
+				
+				out.println("</script>"); 
+				out.println("<BODY class='body & txt-body' leftmargin='0' topmargin='0' marginwidth='0' ONLOAD=\"get_system_date();load_lock();\">"); 
+				out.println("<FORM NAME='Form1' method='post'>"); 
+				out.println("<input  type='hidden' value='NEW' name='SCREEN_NAME'> "); 
+				out.println("<INPUT TYPE='Hidden' NAME='hid_help_type' VALUE=\"\">"); 
+				out.println("<INPUT TYPE='Hidden' NAME='hid_option' VALUE=\"\">"); 
+				out.println("<INPUT TYPE='Hidden' NAME='hid_help_status' VALUE=\"\">");
+				out.println("<INPUT TYPE='Hidden' NAME='hid_status' VALUE=\"New\">"); 
+				out.println("<table width='100%' class=table border='0' cellspacing='0' cellpadding='0'>"); 
+				out.println("<tr>"); 
+				out.println("<td width='8' valign='top'><img src='spacer.gif' width='8' height='8'></td>"); 
+				out.println("<td class='border_wht' valign='top'> "); 
+				out.println("<table class='table' width='100%' border='0' cellspacing='0' cellpadding='0' height='100%'>"); 
+				out.println("<tr> "); 
+				out.println("<td height='30' class='pdn_mainHD'>"+m_header_name+"</td>"); 
+				out.println("</tr>"); 
+				out.println("<tr> "); 
+				out.println("<td height='1'><img src='spacer.gif' width='1' height='1'></td>"); 
+				out.println("</tr>"); 
+				out.println("<tr>"); 
+				out.println("<td style='height: 327px'>"); 
+				out.println("<table class='table' border='0' cellpadding='0' cellspacing='0' height='100%' width='100%'>   "); 
+				out.println("<tr>"); 
+				out.println("<td height='1'><img height='1' src='spacer.gif' width='1' /></td>"); 
+				out.println("</tr>"); 
+				out.println("<tr>"); 
+				out.println("<td align='left' class='pdn_txtpos2' style='height: 18px' id='help_box'> Collection - Receipt Report </td>"); 
+				out.println("</tr>"); 
+				out.println("<tr>"); 
+				out.println("<td  height='10px' class='pdn_txtpos'>"); 
+				out.println("<table class='table' cellpadding='2' cellspacing='2' border='0'> "); 
+				out.println("<tr><td width='10%' align='center'></td>");  
+				out.println("<td width='10%' align='center'></td>");  
+				out.println("<td width='10%' align='center'></td>");  
+				out.println("<td width='10%' align='center'></td>");
+				out.println("<td width='10%' align='center'></td>");
+				out.println("<td width='6%'></td>");  
+				//out.println("<td width='10%' align='center'><input type=\"button\" class='mainbut' onMouseout='load_roll_out_value();' onMouseOver='load_roll_value(\"Save\");'  onClick='save_window()' value=\"Save\"></td>");  
+				out.println("<td width='10%' align='center'><input type=\"button\" class='mainbut' onMouseout='load_roll_out_value();' onMouseOver='load_roll_value(\"Help\");' onClick='load_screen_status(\"HELP\")' value=\"Help\"></td>");  
+				out.println("<td width='10%' align='center'><input type=\"button\" class='mainbut' onMouseout='load_roll_out_value();' onMouseOver='load_roll_value(\"Cancel\");'  onclick='clear_window()' value=\"Cancel\"></td>");  
+				out.println("<td width='10%' align='center'><input type=\"button\" class='mainbut' onMouseout='load_roll_out_value();' onMouseOver='load_roll_value(\"Close\");'  onclick='close_window()' value=\"Close\"></td>"); 
+				out.println("<td width='*%' align='right' class='div_input'></td></tr>");  
+				out.println("</table>");  
+				out.println("</td></tr><tr>");  
+				out.println("<td class='line' height='1'><img height='1' src='spacer.gif' width='1' /></td>");  
+				out.println("</tr><tr>");  
+				out.println("<td class='pdn_txtpos' height='150' valign='top'>");  
+				out.println("<table class='table' width='100%'  >"); 
+				out.println("<tr >"); 
+				out.println("<td width='10%' ><DIV id='DIV_TXT_REAL_DATE'  class=div_input><b>From Date</b></DIV></td>"); 
+				out.println("<TD WIDTH=\"15%\"><input class=\"txt_input5\" type=\"text\" name=TXT_FROM_DATE_DD maxlength=\"2\" size=\"2\"  >"); //value=\"01\"
+				out.println("<input class=\"txt_input5\" type=\"text\" name=TXT_FROM_DATE_MM  maxlength=\"2\" size=\"2\" >"); //value=\"04\"
+				out.println("<input class=\"txt_input5\" type=\"text\" name=TXT_FROM_DATE_YY maxlength=\"4\" size=\"4\"   >");	 //value=\"2007\"
+				out.println("</td> ");
+				out.println("<td width='10%' ><DIV id='DIV_TXT_REAL_DATE'  class=div_input><b>To Date</b></DIV></td>"); 
+				out.println(" <TD WIDTH=\"*%\"><input class=\"txt_input5\" type=\"text\" name=TXT_TO_DATE_DD maxlength=\"2\" size=\"2\" >");
+				out.println("<input class=\"txt_input5\" type=\"text\" name=TXT_TO_DATE_MM  maxlength=\"2\" size=\"2\" >");
+				out.println("<input class=\"txt_input5\" type=\"text\" name=TXT_TO_DATE_YY maxlength=\"4\" size=\"4\" >");	
+				out.println("</td> ");
+				out.println("<td width='*%' >");
+				out.println("<input class='but_input' type='button' name='BUT_HELP_MAIN_1' style=\"{width:110px;}\" value=\"View All Receipts\" onClick=\"makeRequest_detail()\">");
+				out.println("<input class='but_input' type='button' name='BUT_HELP_MAIN_2' style=\"{width:110px;}\" value=\"View Cancel Receipts\" onClick=\"makeRequest_detail_cancel()\">");
+				// Added by Dineth on 2008-09-29
+				out.println("<input class='but_input' type='button' name='BUT_HELP_MAIN_3' style=\"{width:110px;}\" value=\"View Return Receipts\" onClick=\"makeRequest_detail_return()\">");
+				// End by Dineth
+				
+				
+				out.println("</td> ");
+				//			out.println("<td width='*%' ></td>");
+				
+				out.println("<tr>");
+				out.println("<td colspan=4>&nbsp;</td>");
+				out.println("<td>");
+				//Added by Dineth on 16-06-2009
+				out.println("<input class='but_input' type='button' name='BUT_HELP_MAIN_4' style=\"{width:110px;}\" value=\"View PDC Receipts\" onClick=\"makeRequest_detail_PDC()\">");
+				//End by Dineth on 16-06-2009
+				out.println("<input class='but_input' type='button' name='BUT_HELP_MAIN_5' style=\"{width:110px;}\" value=\"View Standing Orders \" onClick=\"makeRequest_detail_Stand_Order()\">");//Added By Sandun on 16-09-2009
+				out.println("<input class='but_input' type='button' name='BUT_HELP_MAIN_6' style=\"{width:110px;}\" value=\"View Temp. Receipts\" onClick=\"makeRequest_detail_Stand_Temp()\">");//Added By Sandun on 16-09-2009
+				out.println("</td>");
+				out.println("</tr>");
+				
+				out.println("</table>");  
+				out.println("<br>"); 
+				out.println("<DIV id='invoice_detail_data'  class=div_input></DIV>");
+				out.println("<br>"); 
+				out.println("<table align='center' width='100%'>"); 
+				out.println("<tr>"); 
+				out.println("<td width='100%' class='note'></td>"); 
+				out.println("</tr>"); 
+				out.println("</table>"); 
+				out.println("</form>"); 
+				out.println("<SCRIPT language1.2='JavaScript' src='"+m_html_client_url+"/validate.js'></SCRIPT>"); 
+				out.println("<SCRIPT language1.2='JavaScript' src='"+m_html_client_url+"/factoring_drill_down.js'></SCRIPT>"); 
+				out.println("<SCRIPT language1.2='JavaScript' src='"+m_html_client_url+"/ajax_data_gateway.js'></SCRIPT>"); 
+				out.println("</body>"); 
+				out.println("</html>"); 
+				out.flush();
+			}
+			else if(m_chksql.equals("load_receipts")){
+				
+				String m_branch_id = req.getParameter("branch_id"); // added by udara on 27-02-2013
+				
+				String m_string="";				
+				String m_sql="";	
+				String m_from_date=req.getParameter("from_date");
+				String m_to_date=req.getParameter("to_date");
+				String m_order_by = req.getParameter("order_by");
+				String m_sort_by = req.getParameter("sort_by");
+				String m_location_code = req.getParameter("location_code"); 
+				String mm_location_code = req.getParameter("location_code"); // added by udara on 03-12-2012
+				String m_user = req.getParameter("user");
+				String m_user_query=""; 
+				String m_user_query2=""; 
+				if(m_user!= null && !m_user.equals("")){
+					m_user_query = "AND UPPER(A.ENT_USER) = UPPER('"+m_user+"') ";
+					m_user_query2 = "AND UPPER(REC_ENT_BY) = UPPER('"+m_user+"') ";
+				}
+				
+				// added by udara on 25-07-2013
+				String location_query_part = "";
+				if(!m_branch_id.equals(""))
+					location_query_part = " AND  "+m_schema_name+".AF_CO_GET_USER_LOCATION(A.ENT_USER) = '"+m_branch_id+"' "; 	
+				
+				String m_date_time ="";
+				String m_logged_user="";
+				String m_branch_name="";
+				
+				String m_branch_name_2="";
+				
+				rs1= stmt1.executeQuery(" SELECT "+
+					" TO_CHAR(SYSDATE,'DD-MM-YYYY  HH24:MI:SS'), "+
+					" "+m_schema_name+".AF_CO_GET_USER_NAME('"+m_username+"'), "+
+					" NVL("+m_schema_name+".AF_CO_GET_LOCATION_DESC('"+mm_location_code+"'),'-'),"+
+					" NVL("+m_schema_name+".AF_CO_GET_LOCATION_DESC('"+m_branch_id+"'),'-')"+ // added by udara on 28-08-2013
+					" FROM DUAL ");
+				
+				while(rs1.next()){
+					m_date_time = rs1.getString(1);
+					m_logged_user=rs1.getString(2);
+					m_branch_name = rs1.getString(3);
+					m_branch_name_2 = rs1.getString(4);
+				}
+				
+				
+				double m_tot_rec=0;
+				double tot_count = 0;
+					double total_bbf = 0;
+					
+					double total_collections = 0;
+					double total_banked = 0;
+					
+				
+				if (m_location_code.trim().equals("ALL")) {
+					m_location_code="";
+					//BBF================================================================================================
+					
+					// BBF
+					rs1= stmt1.executeQuery(" "+
+						//out.println(" "+
+						" SELECT TYPE,SUM(TOTAL),COUNT(COUNT),DUMMY FROM ( "+
+						" SELECT SETTLE_MODE TYPE ,REC_AMOUNT TOTAL,REC_AMOUNT COUNT, 1 DUMMY "+
+						" FROM "+m_schema_name+".AF_CO_PRO_SETTL_RECEIPT A "+ // mod by udara 09-08-2013
+						" WHERE  TO_DATE(TO_CHAR(EFF_VALDATE,'DD-MM-YYYY'),'DD-MM-YYYY') < TO_DATE('"+m_from_date+"','DD-MM-YYYY') "+ 
+						" AND A.STATUS NOT IN ('C','CAD') "+m_user_query + // " AND STATUS NOT IN ('C','B') "+m_user_query +
+						" "+location_query_part+"  "+ //" AND  "+m_schema_name+".AF_CO_GET_USER_LOCATION(ENT_USER) LIKE '"+m_branch_id+"%'  "+ // added by udara on 27-02-2013 // mod by udara on 25-07-2013
+						" AND A.REC_NO NOT IN (SELECT REC_NO FROM "+m_schema_name+".AF_CO_PRO_SETTL_RECEIPT WHERE TO_DATE(TO_CHAR(MOD_DATE,'DD-MM-YYYY'),'DD-MM-YYYY') < TO_DATE('"+m_from_date+"','DD-MM-YYYY') AND STATUS='B') "+
+						
+						" UNION ALL	"+				 
+						
+						" SELECT DECODE(PAY_TYPE,'CASH','Web Cash','CHEQUE','Web Cheque') TYPE,REC_TOTAL TOTAL,REC_TOTAL COUNT, 2 DUMMY "+
+						" FROM LAKDAC.WEBAC_TRN_RECEIPTS  "+
+						" WHERE  TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY') < TO_DATE('"+m_from_date+"','DD-MM-YYYY') "+
+						" AND TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY') >= TO_DATE('01-04-2013','DD-MM-YYYY') "+ // added by udara on 07-12-2012 to block receipt till LAKDLAC live start
+						" AND DEPOSIT_STATUS NOT IN ('C','Y') "+m_user_query2 +
+						" ) "+
+						" GROUP BY TYPE, DUMMY "+
+						" ORDER BY TYPE ");
+				}
+				else {
+					
+					
+					rs1= stmt1.executeQuery(" "+
+						//out.println(" "+
+						" SELECT TYPE,SUM(TOTAL),COUNT(COUNT),DUMMY FROM ( "+
+						" SELECT A.SETTLE_MODE TYPE ,A.REC_AMOUNT TOTAL,A.REC_AMOUNT COUNT, 1 DUMMY "+
+						" FROM "+m_schema_name+".AF_CO_PRO_SETTL_RECEIPT  A , "+m_schema_name+".AF_CO_PRO_SETTL_REC_APP_BAL B, "+m_schema_name+".AF_CO_PRO_APPLICATION_DETAILS C "+ 
+						" WHERE  A.REC_NO = B.REC_NO AND B.FINANCE_NO = C.FINANCE_NO  AND "+
+						" TO_DATE(TO_CHAR(A.EFF_VALDATE,'DD-MM-YYYY'),'DD-MM-YYYY') < TO_DATE('"+m_from_date+"','DD-MM-YYYY') "+ 
+						" AND A.STATUS NOT IN ('C','CAD') "+m_user_query + // mod by udara on 28-08-2013 //" AND A.STATUS NOT IN ('C') "+m_user_query +  // " AND A.STATUS NOT IN ('C','B') "+m_user_query +
+						" AND C.BRANCH_CODE = '"+m_location_code+"'  "+ //" AND "+m_schema_name+".AF_CO_GET_APP_LOCATION("+m_schema_name+".AF_CO_GET_APPLICATION_NO(NVL("+m_schema_name+".AF_CO_GET_REC_FIN_NO(REC_NO),'-'))) = '"+m_location_code+"'  "+
+						" "+location_query_part+"  "+ //" AND  "+m_schema_name+".AF_CO_GET_USER_LOCATION(ENT_USER) LIKE '"+m_branch_id+"%'  "+ // added by udara on 27-02-2013 // mod by udara 25-07-2013
+						" AND A.REC_NO NOT IN (SELECT REC_NO FROM "+m_schema_name+".AF_CO_PRO_SETTL_RECEIPT WHERE TO_DATE(TO_CHAR(MOD_DATE,'DD-MM-YYYY'),'DD-MM-YYYY') <= TO_DATE('"+m_from_date+"','DD-MM-YYYY') AND STATUS='B') "+
+						
+						" UNION ALL	"+				 
+						
+						" SELECT DECODE(PAY_TYPE,'CASH','Web Cash','CHEQUE','Web Cheque') TYPE,REC_TOTAL TOTAL,REC_TOTAL COUNT, 2 DUMMY "+
+						" FROM LAKDAC.WEBAC_TRN_RECEIPTS  "+
+						" WHERE  TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY') < TO_DATE('"+m_from_date+"','DD-MM-YYYY') "+
+						" AND TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY') >= TO_DATE('01-04-2013','DD-MM-YYYY') "+ // added by udara on 07-12-2012 to block receipt till LAKDLAC live start
+						" AND DEPOSIT_STATUS NOT IN ('C','Y') "+m_user_query2 +
+						" ) "+
+						" GROUP BY TYPE, DUMMY "+
+						" ORDER BY TYPE ");
+					
+				}
+				
+				
+				
+					while(rs1.next()){
+					
+					tot_count = tot_count + rs1.getDouble(3);
+					total_bbf = total_bbf + rs1.getDouble(2);
+					
+					
+				}
+				/*while(rs1.next()){
+					
+					tot_count = tot_count + rs1.getDouble(3);
+					total_bbf = total_bbf + rs1.getDouble(2);
+					//=====================end bbf======================
+					
+				}*/
+				
+				boolean mflag=true;							
+				boolean more = rs1.next();
+				
+				
+				out.println("<HTML><HEAD><TITLE>Receipt Report </TITLE></HEAD>");
+				out.println("<link REL='STYLESHEET' HREF='"+m_html_client_url+"/css/Asset_Financing_System.css' TYPE=\"text/css\">");
+				out.println("<SCRIPT language=\"JavaScript\">"); 
+				out.println("function sort_data(m_sort_col) {");
+				out.println(" m_location_code='"+mm_location_code+"';"); // added by udara on 03-12-2012
+				out.println(" m_branch_id='"+m_branch_id+"';");  // added by udara on 27-02-2013
+				out.println(" m_from_date ='"+m_from_date+"';");	
+				out.println(" m_to_date='"+m_to_date+"';"); 	
+				out.println("	 m_order_by_type = 'ASC'; ");  
+				out.println("	 if(m_sort_col=='"+m_order_by+"'){");
+				out.println("	   if('"+m_sort_by+"'=='DESC'){");
+				out.println("	      m_order_by_type = 'ASC'; ");  
+				out.println("    }else{");
+				out.println("       m_order_by_type = 'DESC'; ");
+				out.println("    }");
+				out.println("  }else{");
+				out.println("    m_order_by_type = 'ASC'; ");
+				out.println("  }");
+				out.println("		 m_url=\""+m_class_url+"/"+m_fschema_name+"AF_RE_new_receipt_report?chksql=load_receipts&from_date=\"+m_from_date+\"&to_date=\"+m_to_date+\"&order_by=\"+m_sort_col+\"&sort_by=\"+m_order_by_type+\"&user=&location_code=\"+m_location_code+\"&branch_id=\"+m_branch_id;"); // added by udara on 27-02-2013
+				out.println(" window.location.href=m_url;"); 
+				out.println("}");
+				
+				
+				out.println("</SCRIPT>");
+				out.println("<BODY   class='body & txt-body' LEFTMARGIN='0' TOPMARGIN='0'>");
+				out.println("<FORM NAME='Form1' method='post'>");
+				
+				out.println("<TABLE  WIDTH='100%'  align='Center'>");
+				out.println("<TR><TD align='Center' ><B>LAKDERANA INVESTMENTS LIMITED.</B></TD></TR>");
+				out.println("</TABLE>");
+				
+				out.println("<TABLE  WIDTH='100%'  >");
+				out.println("<TR><TD align='left' ><B>Report Generated By : "+m_logged_user+" </B></TD>");
+				out.println("<TD align='right' ><B>Date : "+m_date_time+"</B></TD></TR>");
+				
+				out.println("<TR><TD align='left' ><B>Branch : "+m_branch_name+" </B></TD>");
+				out.println("<TD align='right' ><B> &nbsp; </B></TD></TR>");
+				
+				out.println("<TR><TD align='left' ><B>Location : "+m_branch_name_2+" </B></TD>");
+				out.println("<TD align='right' ><B> &nbsp; </B></TD></TR>");
+				
+				out.println("</TABLE>");
+				
+				out.println("<br>");
+				out.println("<br>");
+				
+				out.println("<TABLE  WIDTH='100%' class='pdn_txtpos2' >");
+				out.println("<TR><TD align='Center' ><B> Receipt Report From  "+m_from_date+" To "+m_to_date+" </B></TD></TR>");
+				out.println("</TABLE>");
+				out.println("<BR>");	
+				//if(!more){
+				//	out.println("<TABLE  WIDTH='100%'  STYLE='{ bgcolor='#8fb382' color: black; font: 20pt arial;}'>");
+				//	out.println("<TR><TD align='Center' ><B> No Data Found </B></TD></TR>");
+				//	out.println("</TABLE>");
+				//}					
+				//if(more){
+					
+					out.println("<table width='100%' class='table' >");						
+					out.println("<tr class=pdn_txtpos2>");
+					out.println("<td width='1%'></td>"); 
+					out.println("<td width='9%'  style= cursor:hand; onclick=sort_data('SUB_REC_NO') ><b>&nbsp;</b></td>"); 
+					out.println("<td width='5%'  style= cursor:hand; onclick=sort_data('SETTLE_MODE') ><b>BBF</b></td>"); // mod by udara on 29-08-2013
+					out.println("<td width='13%' style= cursor:hand; onclick=sort_data('FINANCE_NO_SORT') ><b>Collection</b></td>"); // modified by udara on 03-12-2012
+					out.println("<td width='10%' style= cursor:hand; onclick=sort_data('REC_AMOUNT') ><b>Banked to COM</b></td>");
+					out.println("<td width='15%' style= cursor:hand; onclick=sort_data('EFF_VALDATE') ><b>Banked to SEYLAN</b></td>");
+					out.println("<td width='6%'  style= cursor:hand; onclick=sort_data('N_TYPE') ><b>Banked to UNION 32</b></td>");  
+					out.println("<td width='10%' style= cursor:hand; onclick=sort_data('ENT_USER') ><b>Banked to UNION 16</b></td>"); // modified by udara on 03-12-2012
+					out.println("<td width='24%' style= cursor:hand; onclick=sort_data('ENT_DATE') ><b>SAMPATH</b></td>"); 
+					out.println("<td width='10%'  style= cursor:hand; onclick=sort_data('STATUS') ><b>PAN ASIA</b></td>"); 
+					out.println("<td width='10%'  style= cursor:hand; onclick=sort_data('STATUS') ><b>Cash in Hand</b></td>"); 
+					out.println("</tr>"); 
+					
+				//}
+				
+				
+				// collections
+					if(mm_location_code.trim().equals("ALL")){  
+					m_location_code="";
+					
+					rs1= stmt1.executeQuery(" SELECT TYPE,SUM(TOTAL),COUNT(COUNT),DUMMY FROM ( "+
+						" SELECT SETTLE_MODE TYPE ,REC_AMOUNT TOTAL,REC_AMOUNT COUNT, 1 DUMMY "+
+						" FROM "+m_schema_name+".AF_CO_PRO_SETTL_RECEIPT A "+ // mod by udara 09-08-2013
+						" WHERE  TO_DATE(TO_CHAR(EFF_VALDATE,'DD-MM-YYYY'),'DD-MM-YYYY')>=TO_DATE('"+m_from_date+"','DD-MM-YYYY') "+
+						" AND  TO_DATE(TO_CHAR(EFF_VALDATE,'DD-MM-YYYY'),'DD-MM-YYYY')<=TO_DATE('"+m_to_date+"','DD-MM-YYYY') "+
+						" AND A.STATUS NOT IN ('C','CAD') "+ // added by udara on 28-08-2013
+						"  "+m_user_query + // " AND STATUS NOT IN ('C') "+m_user_query + //" AND STATUS NOT IN ('C','B') "+m_user_query +
+						" "+location_query_part+"  "+ //" AND  "+m_schema_name+".AF_CO_GET_USER_LOCATION(ENT_USER) LIKE '"+m_branch_id+"%'  "+ // added by udara on 27-02-2013 // mod by udara on 25-07-2013
+						
+						" UNION ALL	"+				 
+						
+						" SELECT DECODE(PAY_TYPE,'CASH','Web Cash','CHEQUE','Web Cheque') TYPE,REC_TOTAL TOTAL,REC_TOTAL COUNT, 2 DUMMY "+
+						" FROM LAKDAC.WEBAC_TRN_RECEIPTS  "+
+						" WHERE  TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY')>= TO_DATE('"+m_from_date+"','DD-MM-YYYY') "+
+						" AND TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY')<= TO_DATE('"+m_to_date+"','DD-MM-YYYY') "+
+						" AND TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY')>=TO_DATE('01-04-2013','DD-MM-YYYY') "+ // added by udara on 07-12-2012 to block receipt till LAKDLAC live start
+						" AND DEPOSIT_STATUS NOT IN ('C','Y') "+m_user_query2 +
+						" ) "+
+						" GROUP BY TYPE, DUMMY "+
+						" ORDER BY TYPE ");
+				}
+				else {
+					
+					
+					rs1= stmt1.executeQuery(" SELECT TYPE,SUM(TOTAL),COUNT(COUNT),DUMMY FROM ( "+
+						" SELECT A.SETTLE_MODE TYPE ,A.REC_AMOUNT TOTAL,A.REC_AMOUNT COUNT, 1 DUMMY "+
+						" FROM "+m_schema_name+".AF_CO_PRO_SETTL_RECEIPT  A , "+m_schema_name+".AF_CO_PRO_SETTL_REC_APP_BAL B, "+m_schema_name+".AF_CO_PRO_APPLICATION_DETAILS C "+ 
+						" WHERE  A.REC_NO = B.REC_NO AND B.FINANCE_NO = C.FINANCE_NO  AND "+
+						" TO_DATE(TO_CHAR(A.EFF_VALDATE,'DD-MM-YYYY'),'DD-MM-YYYY')>=TO_DATE('"+m_from_date+"','DD-MM-YYYY') "+ 
+						" AND TO_DATE(TO_CHAR(A.EFF_VALDATE,'DD-MM-YYYY'),'DD-MM-YYYY')<=TO_DATE('"+m_to_date+"','DD-MM-YYYY') "+ 
+						" AND A.STATUS NOT IN ('C','CAD') "+ // added by udara on 28-08-2013
+						"  "+m_user_query + // " AND A.STATUS NOT IN ('C') "+m_user_query + // " AND A.STATUS NOT IN ('C','B') "+m_user_query +
+						" AND C.BRANCH_CODE = '"+m_location_code+"'  "+ //" AND "+m_schema_name+".AF_CO_GET_APP_LOCATION("+m_schema_name+".AF_CO_GET_APPLICATION_NO(NVL("+m_schema_name+".AF_CO_GET_REC_FIN_NO(REC_NO),'-'))) = '"+m_location_code+"'  "+
+						" "+location_query_part+"  "+ //" AND  "+m_schema_name+".AF_CO_GET_USER_LOCATION(ENT_USER) LIKE '"+m_branch_id+"%'  "+ // added by udara on 27-02-2013 // mod by udara 25-07-2013
+						
+						" UNION ALL	"+				 
+						
+						" SELECT DECODE(PAY_TYPE,'CASH','Web Cash','CHEQUE','Web Cheque') TYPE,REC_TOTAL TOTAL,REC_TOTAL COUNT, 2 DUMMY "+
+						" FROM LAKDAC.WEBAC_TRN_RECEIPTS  "+
+						" WHERE  TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY')>= TO_DATE('"+m_from_date+"','DD-MM-YYYY') "+
+						" AND TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY')<= TO_DATE('"+m_to_date+"','DD-MM-YYYY') "+
+						" AND TO_DATE(TO_CHAR(REC_ENT_DATE,'DD-MM-YYYY'),'DD-MM-YYYY')>=TO_DATE('01-04-2013','DD-MM-YYYY') "+ // added by udara on 07-12-2012 to block receipt till LAKDLAC live start
+						" AND DEPOSIT_STATUS NOT IN ('C','Y') "+m_user_query2 +
+						" ) "+
+						" GROUP BY TYPE, DUMMY "+
+						" ORDER BY TYPE ");
+					
+				}
+					
+				
+					while(rs1.next()){
+					
+					total_collections = total_collections + rs1.getDouble(2);
+					
+					
+				}
+					
+				double cash_in=0.00;
+				cash_in=cash_in+total_bbf+total_collections;
+				
+				//out.println("<table width='100%' class='table' >");						
+					out.println("<tr class=pdn_txtpos2>");
+					out.println("<td width='1%'></td>"); 
+					
+					out.println("<td  class=div_input >colombo</td>"); //width='5%'						
+				    out.println("<td  class=div_input >"+nf.format(total_bbf)+"</td>"); //width='5%'						
+					out.println("<td  class=div_input >"+nf.format(total_collections)+"</td>"); //width='5%'						
+					out.println("<td width='10%' style= cursor:hand; onclick=sort_data('REC_AMOUNT') >-</td>");
+					out.println("<td width='15%' style= cursor:hand; onclick=sort_data('EFF_VALDATE') >-</td>");
+					out.println("<td width='6%'  style= cursor:hand; onclick=sort_data('N_TYPE') >-</td>");  
+					out.println("<td width='10%' style= cursor:hand; onclick=sort_data('ENT_USER') >-</td>"); 
+					out.println("<td width='24%' style= cursor:hand; onclick=sort_data('ENT_DATE') >-</td>"); 
+					out.println("<td width='10%'  style= cursor:hand; onclick=sort_data('STATUS') >-</td>"); 
+					out.println("<td width='10%'  style= cursor:hand; onclick=sort_data('STATUS') >"+nf.format(cash_in)+"</td>"); 
+					out.println("</tr>"); 
+				
+				
+				/*int i=1;
+				while(more){
+					
+					if(mflag){
+						out.println("<tr class=tr_input>");
+						mflag=false;
+					}
+					else{
+						out.println("<tr class=tr_input1>");
+						mflag=true;
+					}
+					out.println("<td >"+i+"</td>");
+					out.println("<td  class=div_input >colombo</td>");
+					out.println("<td  class=div_input >"+nf.format(total_bbf)+"</td>"); //width='5%'						out.println("<td  class=div_input onClick=\"show_settle_receipt_drill('"+rs1.getString(1)+"')\" style='cursor:hand'><u>"+rs1.getString(17)+"</u></td>"); //width='20%'
+					out.println("<td  class=div_input >"+nf.format(total_collections)+"</td>"); //width='5%'						/*out.println("<td  class=div_input ><p>"+rs1.getString(11)+"</p></td>"); //width='15%'
+					//
+					//================================================================================================
+
+					//out.println("<td width='20%' class=div_input >"+collection_val+"</td>");
+					
+					//out.println("<td  class=div_input align='right' >"+nf.format(rs1.getDouble(2))+"</td>"); //width='10%'
+					
+					//out.println("<td  class=div_input >&nbsp;"+rs1.getString(2)+"</td>"); //width='14%'*/
+					//out.println("<td  class=div_input >"+rs1.getString(4)+"</td>"); //width='10%'
+					//out.println("<td class=div_input >"+rs1.getString(5)+"</td>"); // width='20%'
+					//out.println("<td class=div_input >"+rs1.getString(14)+"</td>"); //width='5%' 
+					//out.println("<td width='10%' class=div_input >"+rs1.getString(13)+"</td>");
+					/*out.println("</tr>");
+					m_tot_rec=m_tot_rec+rs1.getDouble(2);
+					i++;
+					more = rs1.next();
+					
+				}	*/
+				out.println("<tr>");
+				out.println("<td ></td>"); 
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>"); // added by udara on 31-07-2013
+				//out.println("<td  class=div_input align='right' >___________</b></td>");
+				out.println("<td  class=div_input >&nbsp;</td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("</tr>");
+				out.println("<tr>");
+				out.println("<td ></td>"); 
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>"); // added by udara on 31-07-2013
+				//out.println("<td  class=div_input align='right' ><b>"+nf.format(m_tot_rec)+"</b></td>");
+				out.println("<td  class=div_input >&nbsp;</td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("<td  class=div_input ></td>");
+				out.println("</tr>");
+				out.println("</table>");
+				out.println("<br><br><br>"); 
+				
+				out.println("</table>"); 
+				
+				out.println("<br><br><br>");
+				
+				// end by udara on 05-08-2013 ===================================================================================
+				
+				out.println("<br><br><br>"); 
+				
+				out.println("</form>"); 
+				out.println("<SCRIPT language1.2='JavaScript' src='"+m_html_client_url+"/leasing_drill_down.js'></SCRIPT>"); 
+				out.println("</BODY></HTML>");
+				
+				
+				
+			}
+			
+			
+		}
+		catch (Exception ex) {
+			try{out.println("Error:"+ex.toString());
+			}catch(Exception e){}
+		}
+		finally{
+			if(out!=null){
+				try{out.close();  
+				}catch(Exception e){}
+			}
+		}
+	}
+}

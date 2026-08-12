@@ -1,0 +1,138 @@
+// Decompiled by DJ v3.5.5.77 Copyright 2003 Atanas Neshkov  Date: 5/9/2013 10:04:00 AM
+// Home Page : http://members.fortunecity.com/neshkov/dj.html  - Check often for new version!
+// Decompiler options: packimports(3) 
+// Source File Name:   Method.java
+
+import java.text.DecimalFormat;
+
+public class Method
+{
+
+    public Method()
+    {
+    }
+
+    public static String convert(long l)
+    {
+        if(l == 0L)
+            return "Zero";
+        String s = Long.toString(l);
+        String s1 = "000000000000";
+        DecimalFormat decimalformat = new DecimalFormat(s1);
+        s = decimalformat.format(l);
+        int i = Integer.parseInt(s.substring(0, 3));
+        int j = Integer.parseInt(s.substring(3, 6));
+        int k = Integer.parseInt(s.substring(6, 9));
+        int i1 = Integer.parseInt(s.substring(9, 12));
+        String s2;
+        switch(i)
+        {
+        case 0: // '\0'
+            s2 = "";
+            break;
+
+        case 1: // '\001'
+            s2 = convertLessThanOneThousand(i) + " Billion ";
+            break;
+
+        default:
+            s2 = convertLessThanOneThousand(i) + " Billion ";
+            break;
+        }
+        String s3 = s2;
+        String s4;
+        switch(j)
+        {
+        case 0: // '\0'
+            s4 = "";
+            break;
+
+        case 1: // '\001'
+            s4 = convertLessThanOneThousand(j) + " Million ";
+            break;
+
+        default:
+            s4 = convertLessThanOneThousand(j) + " Million ";
+            break;
+        }
+        s3 = s3 + s4;
+        String s5;
+        switch(k)
+        {
+        case 0: // '\0'
+            s5 = "";
+            break;
+
+        case 1: // '\001'
+            s5 = "One Thousand ";
+            break;
+
+        default:
+            s5 = convertLessThanOneThousand(k) + " Thousand ";
+            break;
+        }
+        s3 = s3 + s5;
+        String s6 = convertLessThanOneThousand(i1);
+        s3 = s3 + s6;
+        return s3.replaceAll("^\\s+", "").replaceAll("\\b\\s{2,}\\b", " ");
+    }
+
+    private static String convertLessThanOneThousand(int i)
+    {
+        String s;
+        if(i % 100 < 20)
+        {
+            s = numNames[i % 100];
+            i /= 100;
+        } else
+        {
+            s = numNames[i % 10];
+            i /= 10;
+            s = tensNames[i % 10] + s;
+            i /= 10;
+        }
+        if(i == 0)
+            return s;
+        else
+            return numNames[i] + " Hundred" + s;
+    }
+
+    public String numbersToChar4(String s)
+    {
+        String s1 = "";
+        String s2 = "00";
+        String s4 = "";
+        boolean flag = false;
+        int j = -1;
+        int k = 0;
+        long l = 0L;
+        int i1 = 0;
+        k = s.length();
+        s1 = s.toString();
+        j = s.indexOf(".");
+        if(j != -1)
+        {
+            String s3 = s.substring(j + 1, k);
+            int i = s3.length();
+            k = s1.substring(0, j).length();
+            s1 = s.substring(0, j);
+            i1 = Integer.parseInt(s3);
+        }
+        l = Long.parseLong(s1);
+        if(i1 != 0)
+            s4 = convert(l) + " and " + convert(i1) + "  cents";
+        else
+        if(i1 == 0)
+            s4 = convert(l);
+        return s4;
+    }
+
+    private static final String tensNames[] = {
+        "", " Ten", " Twenty", " Thirty", " Forty", " Fifty", " Sixty", " Seventy", " Eighty", " Ninety"
+    };
+    private static final String numNames[] = {
+        "", " One", " Two", " Three", " Four", " Five", " Six", " Seven", " Eight", " Nine", 
+        " Ten", " Eleven", " Twelve", " Thirteen", " Fourteen", " Fifteen", " Sixteen", " Seventeen", " Eighteen", " Nineteen"
+    };
+
+}
