@@ -1,0 +1,165 @@
+<html>
+<head>
+<title>NetAsset - Asset Financing System - © 2007 SasiaNet (Pvt) Limited - All Rights Reserved</title>
+<link REL="STYLESHEET" HREF="css/Asset_Financing_System.css" TYPE="text/css">
+<script LANGUAGE="JAVASCRIPT">
+//variable declaration
+function statusbar()
+{
+	window.status="NetAsset - Asset Financing System - © 2009 SasiaNet (Pvt) Limited - All Rights Reserved";
+}
+function startPage()
+{	
+	getlinks();
+	statusbar();
+}
+function getlinks()
+{
+	 /*
+		var strLinks = hlinkid;
+	 for (i=0; i< hlinkid.length; i++){
+	 strLinks[i].filters.revealTrans.Apply();
+	 strLinks[i].style.visibility="visible";
+	 strLinks[i].filters.revealTrans.Play();
+	 }*/
+}
+function rollon() 
+{
+	if (event.srcElement.className == "hlink") {
+		event.srcElement.className = "hlinkMouseOver";
+	}
+}
+
+function rolloff() 
+{
+	if (event.srcElement.className == "hlinkMouseOver") {
+		event.srcElement.className = "hlink";
+	}
+}
+
+function goto_hylinks(){
+	window.location.href = "http://www.sasianetonline.com";
+	/*
+	if (event.srcElement == hlinkid[0])	{
+	window.open(""+servlet_client_url+":"+client_t3_port+"/"+client_name+"login?screen_name=AF_LOGIN",'AFS','left=0,top=0,toolbar=0,location=0,directories=0,status=0,menuBar=0,scrollBars=1,resizable=0,fullscreen=1');			
+	}
+	if (event.srcElement == hlinkid[1])	{
+	window.location.href = "http://www.sasianetonline.com";
+	}
+	if (event.srcElement == hlinkid[2])	{
+	window.location.href = "http://www.sasianetonline.com";
+	}*/
+}
+
+function goto_hylinks1(){
+	window.open(""+servlet_client_url+":"+client_t3_port+"/"+client_name+"login?screen_name=AF_LOGIN",'AFS','left=0,top=0,toolbar=0,location=0,directories=0,status=0,menuBar=0,scrollBars=0,resizable=1,fullscreen=1');			//
+	
+}
+
+function load_accounts() {
+window.open("http://www.lakdac.lk:/myserver/servlet/LAKDAC_wa_login?screen_name=LAKDAC_MAIN", 'yy','left=0,top=1,toolbar=0,location=0,directories=0,status=0,menuBar=1,scrollBars=1,resizable=1,fullscreen=1');			
+}
+
+
+//function fund_login() {
+//window.open("http://www.tmfclf.lk:/myserver/servlet/MULTIF_login?screen_name=WD_FUND_MAIN", 'CLC_Fund_Management','left=0,top=1,toolbar=0,location=0,directories=0,status=0,menuBar=1,scrollBars=1,resizable=1,fullscreen=1');		 
+//}
+
+
+function get_date()
+{
+//m_date=new Date();
+//system_date.innerHTML=m_date;
+}
+
+function load_lock()
+{//alert(trim("tETS ")+"---");
+//document.oncontextmenu=new Function("return false");
+//window.location="http://www.fcam.lk";
+}
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><style type="text/css">
+<!--
+body {
+	background-repeat: no-repeat;
+}
+-->
+</style></head>
+<body ID="headlines" CLASS="headlineBODY" onLoad="load_lock();startPage();get_date();" onmouseover="rollon()" onmouseout="rolloff()" background="OFSCL_Main_page.jpg"  ><!--onclick="goto_hylinks()" -->
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<table style="background:none">
+<!--tr style="background:none">style="background:none"
+<td ></td><td width="95%" align="LEFT" class="h1" style="background:none" onClick="goto_hylinks()" >Login to NetAsset</td>
+</tr-->
+<tr><td><blockquote>
+              <p><span class="h1"><a onclick="goto_hylinks1()">Login - NetAsset</a></span></p>
+            </blockquote></td></tr>
+<!--<tr><td><blockquote> -->
+					<!--	 <p><span class="h1"><a onclick="fund_login()">Login - Fund Management</a></span></p>-->
+            <!--</blockquote></td></tr> -->
+
+<tr><td><blockquote>						
+						  <p><span class="h1"><a onclick="load_accounts()">Login - WebAccounts</a></span></p>
+            </blockquote></td></tr>
+</table>
+
+						<BR>
+<table style="background:none">
+
+<tr><td><blockquote>
+
+              <p><span class="h1"><a onclick="goto_hylinks1()">System Userguide</a></span></p>
+            </blockquote></td></tr>
+
+
+     <tr>
+            <td><blockquote>
+              <p><span class="h1"><a onclick="goto_hylinks()">Online Support</a></span></p>
+            </blockquote></td>
+          </tr>
+          <tr>
+            <td><blockquote>
+              <p><span class="h1"><a onclick="goto_hylinks1()">Contact SasiaNet</a></span></p>
+            </blockquote></td>
+          </tr>
+          <tr>
+            <td><blockquote>
+              <p><span class="h1"><a onclick="goto_hylinks1()">Downloads</a></span></p>
+            </blockquote></td>
+          </tr>     
+          <!--tr>
+            <td><blockquote>
+              <p><span class="h1"><a href="http://www.sasianet.com/products.aspx">Other SasiaNet Products</a></span></p>
+            </blockquote></td>
+          </tr-->
+</table>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<table align="center">
+<tr>
+<td width="100%" align="center">
+<!--span ID="hlinkid" CLASS="footnote" STYLE="filter: revealTrans(transition =12, duration=2); visibility: visible; z-index: 300;text-align:center;">
+<p><div id="system_date"></div> </p>
+</span-->
+</td></tr>
+</table><script language="JavaScript1.2" SRC="validate_v1.js"></SCRIPT>
+</html>

@@ -1,0 +1,602 @@
+<HTML>
+<HEAD>
+<TITLE>Termination Allocate / Unallocate</TITLE>
+</HEAD>
+<link REL='STYLESHEET' HREF='https://dev-lakdl.sasianet.com/css/Asset_Financing_System.css' TYPE="text/css">
+<SCRIPT language="JavaScript">
+function makeRequest(url,opt,type) {
+var http_request = false;
+if (window.XMLHttpRequest) {
+    http_request = new XMLHttpRequest();
+    if (http_request.overrideMimeType) {
+        http_request.overrideMimeType('text/xml');
+    }
+} else if (window.ActiveXObject) { 
+    try {
+        http_request = new ActiveXObject("Msxml2.XMLHTTP");
+    } catch (e) {
+        try {
+            http_request = new ActiveXObject("Microsoft.XMLHTTP");
+        } catch (e) {}
+    }
+}
+if (!http_request) {
+    alert('Giving up :( Cannot create an XMLHTTP instance');
+    return false;
+}
+ if(opt=='1'){
+  http_request.onreadystatechange = function() { alertContents(http_request); };
+  http_request.open('POST',url, true);
+	 http_request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	 m_send_val = "chksql=get_advance_price_cal&rate="+unformat_noobject(document.Form1.RATE.value)+"&value="+unformat_noobject(document.Form1.GROSS_AMOUNT.value)+
+	              "&terms="+document.Form1.PERIOD.value+"&freq="+document.Form1.REPAYMENT_INTERVAL.value+"&type="+document.Form1.PAYMENT_MODE.value+"&option="+opt+
+	              "&last_rent=&sup_cr="+document.Form1.SUPPLIER_CREDIT.value+"&residual="+unformat_noobject(document.Form1.RESIDUAL_VALUE.value)+
+	              "&supcrper=0&cashout="+document.Form1.CASH_OUTFLOW.value+"&trnsub="+document.Form1.TRANSACTION_SUB.value+"&nittype="+document.Form1.INTEREST_TYPE.value+"&nibsm="+unformat_noobject(document.Form1.NIBSM.value)+
+	              "&trn_type="+document.Form1.TRANSACTION_TYPE.value+"&tax="+document.Form1.VAT_PERCENTAGE.value+"&tax_app="+document.Form1.VAT_PER_APP.value+"&installments=";
+  http_request.send(m_send_val);
+ }else{
+  http_request.onreadystatechange = function() { alertGetContents(http_request,opt,type); };
+  http_request.open('GET',url, true);
+  http_request.send(null);
+ }
+}
+function alertContents(http_request,type) {
+ if (http_request.readyState == 4) {
+    if (http_request.status == 200) {
+         price_cal.innerHTML=http_request.responseText; 
+    } else {
+        alert('There was a problem with the request.');
+    }
+ }
+}
+function alertGetContents(http_request,opt,type) {
+ if (http_request.readyState == 4) {
+    if (http_request.status == 200) {
+      if(opt=="2"){
+         rec.innerHTML=http_request.responseText; 
+      }else if(opt=="3"){
+         document.Form1.tot_val.value=http_request.responseText; 
+         f=document.Form1.hid_opt_val.value ;
+         g=document.Form1.hid_win_opt.value ;
+         if(parseFloat(unformat_noobject(document.Form1.tot_val.value))<=parseFloat(document.Form1.elements["BAL_AMOUNT_"+f].value)){
+           popupwin.document.Form1.tot_val.value=document.Form1.tot_val.value; 
+           popupwin.total.innerHTML=format_noobject(document.Form1.tot_val.value); 
+           document.Form1.elements["SETT_AMOUN_"+f].value=format_noobject(document.Form1.tot_val.value); 
+         }else{
+           popupwin.document.Form1.elements['Text_standard'+g].value      ="NO";
+           popupwin.document.Form1.elements['Text_sett_amount'+g].disabled=false;
+           popupwin.document.Form1.elements['Text_standard'+g].checked    =false;
+         }
+      }else if(opt=="6"){
+         document.Form1.tot_val.value=http_request.responseText; 
+         document.Form1.elements["SETT_AMOUN_0"].value=format_noobject(document.Form1.tot_val.value); 
+      }else if(opt=="5"){
+         rec.innerHTML=http_request.responseText; 
+      }else if(opt=="4"){
+   				data_vec= new Array(); 
+           var xmlbody=http_request.responseXML.documentElement;
+           var vsize=0;
+  				  for(var i=0;i<xmlbody.childNodes.length;i++){
+    				 for(var j=0;j<xmlbody.childNodes[i].childNodes.length;j++){
+      			  data_vec[vsize]=xmlbody.childNodes[i].childNodes[j].text;
+       			vsize++;
+    				}
+   		   }
+          addrow(data_vec,type);
+      }
+    } else {
+        load_followup.innerHTML='';
+    }
+ }
+}
+function addrow( data,type) {
+ str="";
+ i=0;
+ if(data.length>0){
+   if(type=='Rec'){
+     document.Form1.TERMONATION_NO.value       =data[0];
+     get_Receipt_del();
+   }else if(type=='Cli'){
+     document.Form1.CLIENT_CODE.value     =data[0];
+     auto_allocate();
+   }else if(type=='Veh'){
+     document.Form1.VEHICLE_NO.value      =data[0];
+     get_Receipt();
+   }else if(type=='Lea'){
+     document.Form1.LEASE_NO.value        =data[0];
+     get_Receipt();
+   }
+ }
+}
+function Price(num,num1,amount,finno){
+ document.Form1.hid_opt_val.value=num;
+	popupwin = window.open("https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_MK_Price?chksql=main_page&screen_type=Term&amount="+amount+"&app_no="+finno+"", "oBj","left=20,top=100,width=980,height=610");
+}
+function inv_help(num){
+ document.Form1.hid_opt_val.value=num;
+	popupwin = window.open("https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Ter_ReceiptAllocation?chksql=get_Invoice&client="+document.Form1.CLIENT_CODE.value+"", "oBj","left=130,top=200,width=750,height=400");
+}
+function cal_amount(num1,num2) {
+  document.Form1.hid_win_opt.value=num2;
+  document.Form1.hid_opt_val.value=num1;
+  m_inv_bal  = 0;
+  m_inv_allo = 0;
+  m_rec_allo = 0;
+  m_rec_bal  = parseFloat(document.Form1.elements['BAL_AM_'+num1].value);
+  for(i=0;i<parseFloat(document.Form1.hid_count.value);i++){
+    for(j=0;j<parseFloat(document.Form1.elements['hid_invoice_count_'+i].value);j++){
+      if(document.Form1.elements['REC_NO_'+i+'_'+j].value   ==document.Form1.elements['REC_NO_'+num1+'_'+num2].value){
+       if(document.Form1.elements['Text_standard'+i+'_'+j].checked){
+        alert(document.Form1.elements['SETT_AMOUN_'+i+'_'+j].value); 
+        m_inv_allo = parseFloat(m_inv_allo)+parseFloat(unformat_noobject(document.Form1.elements['SETT_AMOUN_'+i+'_'+j].value)) 
+        m_inv_bal  = parseFloat(document.Form1.elements['BAL_AMOUNT_'+i+'_'+j].value); 
+       }
+      }
+    }
+  }
+    for(j=0;j<parseFloat(document.Form1.elements['hid_invoice_count_'+num1].value);j++){
+      //if(j!=parseFloat(num2)){ 
+      if(document.Form1.elements['Text_standard'+num1+'_'+j].checked){
+        m_rec_allo = parseFloat(m_rec_allo)+parseFloat(unformat_noobject(document.Form1.elements['SETT_AMOUN_'+num1+'_'+j].value)) 
+      }
+      //}
+    }
+  alert('m_inv_allo='+m_inv_allo+'---m_inv_bal='+m_inv_bal+'---m_rec_bal='+m_rec_bal+'---m_rec_allo='+m_rec_allo)
+   if(parseFloat(m_inv_allo)>0){
+   if(parseFloat(m_inv_allo)>parseFloat(m_inv_bal)){ 
+      document.Form1.elements['Text_standard'+num1+'_'+num2].value      ="NO";
+      document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].disabled=false;
+      document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].value   =0;
+      document.Form1.elements['Text_standard'+num1+'_'+num2].checked    =false;
+   }else{
+     if(parseFloat(m_inv_bal-m_inv_allo)<parseFloat(m_rec_bal) && parseFloat(m_rec_bal)<parseFloat(m_rec_allo)){ 
+      document.Form1.elements['Text_standard'+num1+'_'+num2].value      ="NO";
+      document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].disabled=false;
+      document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].value   =0;
+      document.Form1.elements['Text_standard'+num1+'_'+num2].checked    =false;
+     }else{
+      document.Form1.elements['Text_standard'+num1+'_'+num2].value      ="YES";
+      document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].disabled=true;
+     }
+   }
+   }else if(parseFloat(m_rec_bal)<parseFloat(m_rec_allo)){
+      document.Form1.elements['Text_standard'+num1+'_'+num2].value      ="NO";
+      document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].disabled=false;
+      document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].value   =0;
+      document.Form1.elements['Text_standard'+num1+'_'+num2].checked    =false;
+     }else{
+      document.Form1.elements['Text_standard'+num1+'_'+num2].value      ="YES";
+      document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].disabled=true;
+     }
+}
+function cal_amount1(opt,am1,am2,num) {
+   document.Form1.hid_win_opt.value=num;
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Ter_ReceiptAllocation?chksql=Add_Min_Amount&amount1="+am1+"&amount2="+am2+"&type="+opt;
+   makeRequest(m_url,'3');
+}
+function cal_amount_del(opt,am1,am2,num) {
+   document.Form1.hid_win_opt.value=num;
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Ter_ReceiptAllocation?chksql=Add_Min_Amount&amount1="+am1+"&amount2="+am2+"&type="+opt;
+   makeRequest(m_url,'6');
+}
+function get_Receipt(m_stat,opt) {
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Ter_ReceiptAllocation?chksql=get_Receipt&client="+document.Form1.CLIENT_CODE.value+"&term_type=&term_no="+document.Form1.TERMONATION_NO.value+"";
+   makeRequest(m_url,'2');
+}
+function get_Receipt_del(val) {
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Ter_ReceiptAllocation?chksql=get_Receipt_del&rec_no="+val+"";
+   makeRequest(m_url,'5');
+}
+function check_receipt(val) {
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_XMLFile?chksql=get_term_no&term_no="+document.Form1.TERMONATION_NO.value+"";
+   makeRequest(m_url,'4','Rec');
+}
+function check_lease(val) {
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_XMLFile?chksql=get_lea_no&lea_no="+document.Form1.LEASE_NO.value+"";
+   makeRequest(m_url,'4','Lea');
+}
+function check_vehicle(val) {
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_XMLFile?chksql=get_veh_no&veh_no="+document.Form1.VEHICLE_NO.value+"";
+   makeRequest(m_url,'4','Veh');
+}
+function load_all_foll(m_stat,opt) {
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Followup?chksql=get_followup&fno=null";
+   makeRequest(m_url,opt);
+}
+function validate_data(){
+m_sub=0;
+if(m_sub=='1'){
+return false;
+}
+else{
+return true;
+}
+}
+function befor_submit(){ 
+for (var i=0; i < document.Form1.elements.length; i++ ) {
+document.Form1.elements[i].disabled=false;
+}
+		if(validate_data()){
+		if(confirm("Are you sure you want to save?")){ 
+		document.Form1.action='https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Save';
+		document.Form1.submit();	
+		}
+		}
+} 
+function load_lock(){	
+}	
+function check_client(val) {
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_XMLFile?chksql=get_client_code&client_code="+document.Form1.CLIENT_CODE.value+"";
+   window.open(m_url);
+   makeRequest(m_url,'4','Cli');
+}
+function clear_window(){	
+		if(confirm("Are You Sure?")){ 
+		window.location.href='https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Followup';
+		}
+}
+function new_window(){	
+window.location.href='https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Followup';
+}
+
+
+function save_window(){	
+before_submit();
+}
+
+function befor_back(){
+   close_window(); 
+}
+function befor_reset(){
+ if(confirm("Are you sure you want to clear the screen?")){  
+window.location.href='https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Ter_ReceiptAllocation?chksql=main_page'
+ }  
+}
+function load_help_msg() {
+    m_help_message = "m_help_msg_LAKDL_AF_CO_Followup";
+    HelpBox_msg(m_help_message);
+}
+function HelpBox_msg(m_help_message) {
+	popupwin = window.showModalDialog(servlet_client_url+":"+client_t3_port+"/"+client_name+"AF_MAS_Help_Msg_Servlet?class_in="+client_name+"AF_MAS_Help_Msg_select"+
+  "&help_message_in="+m_help_message);
+}
+function load_roll_value(m_val){
+help_box.innerHTML=" Termination - Allocate / Unallocate - "+m_val;
+}
+
+function load_roll_out_value(){
+help_box.innerHTML=" Termination - Allocate / Unallocate - "+document.Form1.hid_status.value;
+}
+function load_screen_status(m_val){
+document.Form1.hid_option.value    =m_val;
+if(m_val=="NEW"){
+if(confirm("Are you sure you want to enter new record?")){  
+document.Form1.CLIENT_CODE.disabled=false;
+document.Form1.cli_help.disabled=false;
+document.Form1.rec_help.disabled=true;
+document.Form1.TERMONATION_NO.disabled=true;
+document.Form1.CLIENT_CODE.value="";
+rec.innerHTML='';
+}
+}
+/*else if(m_val=="HELP"){
+load_help_msg();
+}
+else if(m_val=="DELETE"){
+ if(confirm("Are you sure you want to delete record?")){  
+document.Form1.CLIENT_CODE.disabled=true;
+document.Form1.cli_help.disabled=true;
+document.Form1.rec_help.disabled=false;
+document.Form1.TERMONATION_NO.disabled=false;
+document.Form1.TERMONATION_NO.value="";
+rec.innerHTML='';
+}
+}
+else{
+document.Form1.BUT_HELP_MAIN.disabled=false;}
+document.Form1.OPTION_DESC.value=m_val;
+if(m_val=="NEW"){
+document.Form1.hid_status.value="New";
+}else if(m_val=="DELETE"){
+document.Form1.hid_status.value="Delete";
+}else if(m_val=="DACT"){
+document.Form1.hid_status.value="Deactivate";
+}else if(m_val=="RACT"){
+document.Form1.hid_status.value="Reactivate";
+}else{
+document.Form1.hid_status.value="";
+}
+}*/
+}
+function auto_allocate(){
+  get_Receipt();
+}
+function MyDialog(){
+    this.valout   = new Array(10);
+}		
+
+function HelpBox(Start,End,Hid_No,Crit,Sql,IfCount) {
+    oBj = new MyDialog();
+    oBj.valout[1]  = " ";
+    oBj.valout[2]  = " ";
+    oBj.valout[3]  = " ";
+	
+popupwin = window.showModalDialog('https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Help_Servlet?class_in=LAKDL_AF_CO_help_select&Sql_in='+Sql+'&Start_in='+Start+'&End_in='+End+'&Crit_In='+Crit+'&Hid_No='+Hid_No+'&Max_in='+Hid_No+'&Args=', oBj,"dialogWidth:25em; dialogHeight:26em; center:yes; status:no");
+	
+	if(oBj.valout[1] !=" "){
+	if(oBj.valout[1] !="Close"){
+	if(oBj.valout[1]!="Prev"){
+	if(oBj.valout[1]!="Next"){
+		if(IfCount=="99"){
+		help_update_value_assign_99();
+		}
+		if(IfCount=="1"){
+		client_assign(oBj);
+		}
+		if(IfCount=="2"){
+		receipt_assign(oBj);
+		}
+		if(IfCount=="4"){
+		vehicle_assign(oBj);
+		}
+		if(IfCount=="3"){
+		lease_assign(oBj);
+		}
+	}
+	else{
+		Next(oBj.valout[2],oBj.valout[3],Hid_No,Crit,Sql,IfCount);
+		return false;
+	} 
+	}
+	else{	
+	Prev(oBj.valout[2],oBj.valout[3],Hid_No,Crit,Sql,IfCount);
+	}	
+	}		
+	}	
+}
+
+function Prev(Start,End,Hid_No,Crit,Sql,IfCount){
+    HelpBox(Start,End,Hid_No,Crit,Sql,IfCount);
+}
+
+function Next (Start,End,Hid_No,Crit,Sql,IfCount){
+    HelpBox(Start,End,Hid_No,Crit,Sql,IfCount);
+}
+
+function client_help(){
+Crit=document.Form1.CLIENT_CODE.value+"@";
+HelpBox('1','10','0',Crit,'ClientSql','1');
+}
+function client_assign(oBj){
+ document.Form1.CLIENT_NAME.value =oBj.valout[3]
+ document.Form1.CLIENT_CODE.value =oBj.valout[2]
+ check_client(document.Form1.CLIENT_CODE.value);
+}
+function receipt_help(){
+Crit=document.Form1.TERMONATION_NO.value+"@";
+HelpBox('1','10','0',Crit,'TerminationNoSql','2');
+}
+function receipt_assign(oBj){
+ document.Form1.TERMONATION_NO.value =oBj.valout[2]
+ get_Receipt_del(document.Form1.TERMONATION_NO.value);
+}
+function lease_help(){
+Crit=document.Form1.LEASE_NO.value+"@";
+HelpBox('1','10','0',Crit,'LeaseSql','3');
+}
+function lease_assign(oBj){
+ document.Form1.LEASE_NO.value =oBj.valout[2]
+ get_Receipt_del(document.Form1.LEASE_NO.value);
+}
+function vehicle_help(){
+Crit=document.Form1.VEHICLE_NO.value+"@";
+HelpBox('1','10','0',Crit,'VehicleSql','4');
+}
+function vehicle_assign(oBj){
+ document.Form1.VEHICLE_NO.value =oBj.valout[2]
+ get_Receipt_del(document.Form1.VEHICLE_NO.value);
+}
+function help_update_value_assign_99() {
+    document.Form1.TXT_FOLLOW_UP_NO.value=oBj.valout[2];
+    document.Form1.TXT_ID_NO.value=oBj.valout[3];
+    document.Form1.TXT_ACTION_TOBE_TAKEN.value=oBj.valout[4];
+    document.Form1.TXT_EFF_VAL_DATE.value=oBj.valout[5];
+    document.Form1.TXT_ACTION_TOOK.value=oBj.valout[6];
+    document.Form1.TXT_ACTION_TOOK_DATE.value=oBj.valout[7];
+    document.Form1.TXT_ACTION_SET_FOR.value=oBj.valout[8];
+    document.Form1.TXT_SCREEN_NAME.value=oBj.valout[9];
+    document.Form1.TXT_DIVISION_CODE.value=oBj.valout[10];
+    document.Form1.TXT_ENT_REMARKS.value=oBj.valout[11];
+    document.Form1.TXT_REMARKS.value=oBj.valout[12];
+    document.Form1.TXT_ACTION_ENT_DATE.value=oBj.valout[13];
+}
+function load_edit_window(i,foll_no,type) {
+   
+}
+function befor_end(m_obj) {
+   m_obj.focus();
+}
+function load_c_date(val) {
+  if(document.Form1.hid_cal_date.value=='1'){
+     document.Form1.TXT_EFF_VAL_DATE.value=val;
+  }else if(document.Form1.hid_cal_date.value=='2'){
+     document.Form1.TXT_ACTION_TOOK_DATE.value=val;
+  }else if(document.Form1.hid_cal_date.value=='3'){
+     document.Form1.TXT_next_day.value=val;
+  }
+}
+function load_data(num) {
+	popupwin = window.open("https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Documents?chksql=get_documents&deal_no="+num+"", "oBj","left=150,top=280,width=520,height=290");
+}
+function load_history(num) {
+	if(num!=''){ 
+	  popupwin = window.open("https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Followup?chksql=get_History&deal_no="+num+"", "oBj","left=100,top=200,width=650,height=400");
+	}else{
+	  alert('Please enter Followup Number and continue!');
+	}
+}
+function check_status(num1,num2) {
+if(document.Form1.elements['Text_standard'+num1+'_'+num2].checked){
+  cal_amount(num1,num2);
+}else{
+  document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].value    = "0.00";
+  document.Form1.elements['Text_standard'+num1+'_'+num2].value  = "NO";
+  document.Form1.elements['SETT_AMOUN_'+num1+'_'+num2].disabled = false;
+}
+}
+function check_amount(num) {
+if(Number(document.Form1.elements['Text_sett_amount'+num].value)>Number(document.Form1.elements['Hid_amount'+num].value)){
+ alert('Amount cannot be greater than Net Amount');
+ document.Form1.elements['Text_sett_amount'+num].value = document.Form1.elements['Hid_amount'+num].value;
+}
+}
+function check_status_del(num,num1) {
+if(document.Form1.elements['Text_standard'+num+'_'+num1].checked){
+ document.Form1.elements['Text_standard'+num+'_'+num1].value="YES";
+}else{
+ document.Form1.elements['Text_standard'+num+'_'+num1].value="NO";
+}
+}
+</script>
+<BODY class='body & txt-body' leftmargin='0' topmargin='0' marginwidth='0' ONLOAD="load_roll_out_value();load_lock();">
+<FORM NAME='Form1' method='post'>
+<input type='hidden' name='Hid_scr_name' value='AF_TERMINATION_ALLO_UNALLO' > 
+<input type='hidden' name='TXT_SCREEN_NAME' value='AF_TERMINATION_ALLO_UNALLO' > 
+<INPUT TYPE='Hidden' NAME='hid_date' VALUE="">
+<INPUT TYPE='Hidden' NAME='hid_cal_date' VALUE="">
+<INPUT TYPE='Hidden' NAME='hid_status' VALUE="New">
+<INPUT TYPE='Hidden' NAME='hid_option' VALUE="NEW">
+<INPUT TYPE='Hidden' NAME='hid_win_type' VALUE="Main">
+<input type=hidden name="OPTION_DESC" value="NEW">
+<input type=hidden name="tot_val" value="0">
+<input type=hidden name="hid_opt_val" value="0">
+<input type=hidden name="hid_win_opt" value="0">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" height="100%" class=table>
+<tr>
+<td width="8" valign="top"><img src="https://dev-lakdl.sasianet.com/images/spacer.gif" width="8" height="8"></td>
+<td class="border_wht" valign="top"> 
+<table width="100%" border="0" cellspacing="0" class=table cellpadding="0" height="100%">
+<tr> 
+<td height="6%" class="pdn_mainHD" class>Asset Financing System (Beta Version 1.2)</td>
+</tr>
+<tr> 
+<td height="1"><img src="https://dev-lakdl.sasianet.com/images/spacer.gif" width="1" height="1"></td>
+</tr>
+<tr>
+<td style="height: 327px">
+<table border="0" cellpadding="0" class=table cellspacing="0" height="100%" width="100%">   
+<tr>
+<td height="1"><img height="1" src="https://dev-lakdl.sasianet.com/images/spacer.gif" width="1" ></td>
+</tr>
+<tr>
+<td align="left" class="pdn_txtpos2" height="2%" id=help_box></td>
+</tr>
+<tr>
+<td  height="10px" class="pdn_txtpos">
+<table cellpadding="2" cellspacing="2" border="0" class=table>
+<tr>
+<td style="width: 6px"></td>
+<td width=10%>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td><input type=button name=reset value="New" class=mainbut onclick=load_screen_status("NEW"); onMouseOver='load_roll_value("New");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+<td>&nbsp;</td>
+<td><input type=button name=edit value="Delete" class=mainbut onclick=load_screen_status("DELETE"); onMouseOver='load_roll_value("Delete");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+<td width=10%>&nbsp;</td>
+<td>&nbsp;</td>
+<td ><input type=button name=b_submit value="Save" class=mainbut onclick=befor_submit(); onMouseOver='load_roll_value("Save");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+<td>&nbsp;</td>
+<td><input class='mainbut' type='button' name='BUT_HELP_MAIN' value="Help" onClick="help_update()" disabled>  </td>
+<td>&nbsp;</td>
+<td><input type=button name=back value="Close" class=mainbut onclick=befor_back(); onMouseOver='load_roll_value("Close");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+<td>&nbsp;</td>
+<td><input type=button name=reset value="Cancel" class=mainbut onclick=befor_reset(); onMouseOver='load_roll_value("Cancel");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+</tr></table>
+</td>	
+</tr>
+<tr>
+<td class="line" height="1"><img height="1" src="https://dev-lakdl.sasianet.com/images/spacer.gif" width="1" ></td>
+</tr>
+<tr>
+<td class="pdn_txtpos" height="150" valign="top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" class=table>
+<tr class=tr_input>
+<td id=fod>Termination No</td>
+<td><input name="TERMONATION_NO" type="text" maxlength="15" class="txt_input" onchange=check_receipt() value=TN20061221-0007> 
+<input type=button name=rec_help value=Help class="but_input" onclick="receipt_help()" disabled></td>
+</td>
+<td id=tod></td>
+<td> 
+</td>
+</tr>
+<tr class=tr_input>
+<td id=fod>Client Code</td>
+<td><input name="CLIENT_CODE" type="text" maxlength="10" class="txt_input" onchange=check_client() value=CLIENT2> 
+<input type=button name=cli_help value=Help class="but_input" onclick="client_help()"></td>
+</td>
+<td id=tod>Client Name</td>
+<td> <input name="CLIENT_NAME" type="text" maxlength="10" class="txt_input" disabled style="width:300px;">
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td class="pdn_txtpos" height="150" valign="top">
+<div id=rec><input type=hidden name=hid_count value=0>
+</td>
+</tr>
+<tr>
+<td class="pdn_txtpos" height="150" valign="top">
+<div id=inv>
+</td>
+</tr>
+<tr class=tr_input>
+<td class="line" height="1">
+<img height="1" src="https://dev-lakdl.sasianet.com/images/spacer.gif" width="1" ></td>
+</tr>
+<tr class=tr_input>
+<td class="pdn_txtpos" style="height: 10px">
+<table cellpadding="2" cellspacing="2" border="0" class=table>
+<tr class=tr_input>
+<td style="width: 6px"></td>
+<td width=10%>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td><input type=button name=new_1 value="New" class=mainbut onclick=befor_new(); onMouseOver='load_roll_value("New");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+<td>&nbsp;</td>
+<td><input type=button name=edit value="Delete" class=mainbut onclick=load_screen_status("DELETE"); onMouseOver='load_roll_value("Delete");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+<td width=10%>&nbsp;</td>
+<td>&nbsp;</td>
+<td ><input type=button name=b_submit_1 value="Save" class=mainbut onclick=befor_submit(); onMouseOver='load_roll_value("Save");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+<td>&nbsp;</td>
+<td><input class='mainbut' type='button' name='BUT_HELP_MAIN' value="Help" onClick="help_update()" disabled>  </td>
+<td>&nbsp;</td>
+<td><input type=button name=back_1 value="Close" class=mainbut onclick=befor_back(); onMouseOver='load_roll_value("Close");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+<td>&nbsp;</td>
+<td><input type=button name=reset_1 value="Cancel" class=mainbut onclick=befor_reset(); onMouseOver='load_roll_value("Cancel");' onmouseout='load_roll_value(document.Form1.hid_status.value);'></td>
+</tr></table>
+&nbsp;&nbsp;</td>
+</tr>
+<tr class=tr_input>
+<td class="pdn_txtpos1 & txt-bodyRed">
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<tr class=tr_input> 
+<td valign="bottom" height="20"></td>
+</tr>
+</table>
+</form>
+<SCRIPT language1.2='JavaScript' src='https://dev-lakdl.sasianet.com/validate.js'></SCRIPT>
+<SCRIPT language1.2='JavaScript' src='https://dev-lakdl.sasianet.com/validate_v1.js'></SCRIPT>
+</body>
+</html>
+

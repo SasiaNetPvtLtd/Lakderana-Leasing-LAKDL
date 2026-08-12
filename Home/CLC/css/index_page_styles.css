@@ -1,0 +1,51 @@
+<STYLE>
+.headlinebody
+{
+    BACKGROUND: #ffffff;
+    MARGIN-LEFT: 0px;
+    MARGIN-RIGHT: 0px;
+    MARGIN-TOP: 3px;
+    bgcolor: #FFFFFF
+}
+.hlink
+{
+    COLOR:orange;
+    FONT-FAMILY:Verdana;
+    FONT-SIZE: 12px;
+    FONT-WEIGHT:bold;
+    FONT-ALIGN:CENTER;
+}
+.hlinkMouseOver
+{
+    COLOR: blue;
+    CURSOR: hand;
+    FONT-FAMILY: Verdana;
+    FONT-SIZE: 12px;
+    FONT-STYLE: italic;
+    FONT-WEIGHT: bold
+}
+.hlinksAni
+{
+    COLOR: red;
+    FONT-FAMILY:Verdana;
+    FONT-SIZE: 12px;
+    FONT-STYLE: italic;
+    FONT-WEIGHT: bold
+}
+.P
+{
+    COLOR:yellow;
+    FONT-FAMILY:Verdana;
+    FONT-SIZE: 12px;
+    FONT-STYLE:italic;
+}
+.footnote
+{
+    COLOR: blue;
+    FONT-FAMILY:Verdana;
+    FONT-SIZE: 10px;
+    FONT-STYLE: italic;
+    TEXT-INDENT: 0.7in;
+    TEXT-ALIGN:CENTER
+}
+</STYLE>

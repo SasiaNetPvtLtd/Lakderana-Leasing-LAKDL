@@ -1,0 +1,101 @@
+<html>
+<head>
+<title>NetAsset - Asset Financing System - Copyright SasiaNet (Pvt) Limited</title>
+<link REL="STYLESHEET" HREF="css/Asset_Financing_System.css" TYPE="text/css">
+<script LANGUAGE="JAVASCRIPT">
+//variable declaration
+function statusbar()
+{
+	window.status="NetAsset - Asset Financing System - Copyright SasiaNet (Pvt) Limited";
+}
+function startPage()
+{	
+	getlinks();
+	statusbar();
+}
+function getlinks()
+{
+	 /*
+		var strLinks = hlinkid;
+	 for (i=0; i< hlinkid.length; i++){
+	 strLinks[i].filters.revealTrans.Apply();
+	 strLinks[i].style.visibility="visible";
+	 strLinks[i].filters.revealTrans.Play();
+	 }*/
+}
+function rollon() 
+{
+	if (event.srcElement.className == "hlink") {
+		event.srcElement.className = "hlinkMouseOver";
+	}
+}
+
+function rolloff() 
+{
+	if (event.srcElement.className == "hlinkMouseOver") {
+		event.srcElement.className = "hlink";
+	}
+}
+
+function goto_hylinks(){
+	if (event.srcElement == hlinkid[0])	{
+	window.open(""+servlet_client_url+":"+client_t3_port+"/"+client_name+"login?screen_name=AF_LOGIN",'ASF','left=0,top=0,toolbar=0,location=0,directories=0,status=0,menuBar=0,scrollBars=1,resizable=0,fullscreen=1');			
+	}
+	if (event.srcElement == hlinkid[1])	{
+	window.location.href = "http://www.sasianetonline.com";
+	}
+	if (event.srcElement == hlinkid[2])	{
+	window.location.href = "http://www.sasianetonline.com";
+	}
+}
+
+function goto_hylinks(){
+	window.open(""+servlet_client_url+":"+client_t3_port+"/"+client_name+"login?screen_name=AF_LOGIN",'ASF','left=0,top=0,toolbar=0,location=0,directories=0,status=0,menuBar=0,scrollBars=1,resizable=0,fullscreen=1');			
+	
+}
+
+
+function get_date()
+{
+//m_date=new Date();
+//system_date.innerHTML=m_date;
+}
+
+function load_lock()
+{//alert(trim("tETS ")+"---");
+//document.oncontextmenu=new Function("return false");
+}
+</script>
+</head>
+<body ID="headlines" CLASS="headlineBODY" onload="load_lock();startPage();get_date();" onmouseover="rollon()" onmouseout="rolloff()" background="LAKDL_Main_page.jpg" ><!--onclick="goto_hylinks()" -->
+<br>
+<br>
+
+<br>
+<br>
+<table align="center">
+<tr>
+<td width="100%" align="center" onclick="goto_hylinks()" CLASS=h1>Login</td>
+</table>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<table align="center">
+<tr>
+<td width="100%" align="center">
+<!--span ID="hlinkid" CLASS="footnote" STYLE="filter: revealTrans(transition =12, duration=2); visibility: visible; z-index: 300;text-align:center;">
+<p><div id="system_date"></div> </p>
+</span-->
+</td></tr>
+</table><script language="JavaScript1.2" SRC="validate_v1.js"></SCRIPT>
+</html>

@@ -1,0 +1,14 @@
+function validate_NIC(object){      
+//m_objval = object.value;
+//m_length = m_objval.toString().length;
+//if(m_length>10){
+		alert('You are entering new formatted NIC number');		
+	//	new_NIC_validation(object);
+			
+//	} else{
+	//	alert('You are entering old formatted NIC number');
+	//	old_NIC_validation(object);
+//	}	
+       		
+ } 
+	

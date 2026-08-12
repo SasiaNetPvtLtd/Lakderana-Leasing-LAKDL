@@ -1,0 +1,626 @@
+<html>
+<head>
+<title>Asset Financing System</title>    
+<link href="https://dev-lakdl.sasianet.com/css/Asset_Financing_System.css" rel="stylesheet" type="text/css" >
+</head>
+<Script>
+var m_bsubmit = '0';
+var arr_assign= new Array();
+var m_send_val= '';
+function makeRequest(url,opt,opt1) {
+var http_request = false;
+if (window.XMLHttpRequest) {
+    http_request = new XMLHttpRequest();
+    if (http_request.overrideMimeType) {
+        http_request.overrideMimeType('text/xml');
+    }
+} else if (window.ActiveXObject) { 
+    try {
+        http_request = new ActiveXObject("Msxml2.XMLHTTP");
+    } catch (e) {
+        try {
+            http_request = new ActiveXObject("Microsoft.XMLHTTP");
+        } catch (e) {}
+    }
+}
+if (!http_request) {
+    alert('Giving up :( Cannot create an XMLHTTP instance');
+    return false;
+}
+ if(opt1=='YES'){
+  http_request.onreadystatechange = function() { alertContents(http_request); };
+  http_request.open('POST',url, true);
+	 http_request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	 m_fact_val = "";
+	 m_prac_val = "";
+  m_percentage = "";
+  m_char_val = "0";
+  m_main_val = "0";
+  m_mainten  = "";
+  m_cash_out = "";
+  m_cashOAmo = "0";
+  for(i=0;i<parseFloat(document.Form1.hid_count.value);i++){
+    m_send_val   = m_send_val+unformat_noobject(document.Form1.elements["NETAMT"+i].value)+"@";
+    m_fact_val   = m_fact_val+unformat_noobject(document.Form1.elements["FACTOR"+i].value)+"@";
+    m_prac_val   = m_prac_val+unformat_noobject(document.Form1.elements["PRACENT"+i].value)+"@";
+    m_cash_out   = m_cash_out+unformat_noobject(document.Form1.elements["CASHOUT"+i].value)+"@";
+    m_cashOAmo   = parseFloat(m_cashOAmo)+parseFloat(unformat_noobject(document.Form1.elements["CASHOUT"+i].value));
+    m_percentage = m_percentage+unformat_noobject(document.Form1.elements["PERCENTAGE"+i].value)+"@";
+	 }
+	 document.Form1.CASH_OUTFLOW.value=m_cash_out;
+	 window.opener.document.Form1.CASH_OUTFLOW.value=m_cash_out;
+	 if(parseFloat(m_cashOAmo)!=parseFloat(document.Form1.GROSS_AMOUNT.value)){
+	   alert('Please Check the Cash Outflow Amounts.');
+	   return false;
+	 }
+	 m_send_val = "chksql=get_outflow_recal&rate="+unformat_noobject(document.Form1.RATE.value)+"&value="+unformat_noobject(document.Form1.GROSS_AMOUNT.value)+
+	              "&terms="+document.Form1.PERIOD.value+"&freq="+document.Form1.REPAYMENT_INTERVAL.value+"&type="+document.Form1.PAYMENT_MODE.value+"&option="+
+	              "&last_rent=&sup_cr="+document.Form1.SUPPLIER_CREDIT.value+"&residual="+unformat_noobject(document.Form1.RESIDUAL_VALUE.value)+
+	              "&supcrper=0&cashout="+document.Form1.CASH_OUTFLOW.value+"&trnsub="+document.Form1.TRANSACTION_SUB.value+"&nittype="+document.Form1.INTEREST_TYPE.value+"&nibsm="+unformat_noobject(document.Form1.NIBSM.value)+
+	              "&trn_type="+document.Form1.TRANSACTION_TYPE.value+"&tax="+document.Form1.VAT_PERCENTAGE.value+"&tax_app="+document.Form1.VAT_PER_APP.value+"&installments=";
+	 if(document.Form1.INTEREST_TYPE.value=='VARIABLE'){
+	   m_send_val = m_send_val+"&nitbasemar="+document.Form1.INTEREST_BASE.value+"&nitmar="+document.Form1.INTEREST_MARGIN.value+"";
+	 }else{
+	   m_send_val = m_send_val+"&nitbasemar=&nitmar=";
+	 }
+    m_send_val = m_send_val+"&maintan="+document.Form1.MAINTANENCE.value+"&factor="+m_fact_val+"&pracent="+m_prac_val+"&ami="+document.Form1.AMI.value+"&other_cha="+document.Form1.CHARGE.value+"&percentage="+m_percentage;
+  window.open(url+'?'+m_send_val);
+  http_request.send(m_send_val);
+ }else{
+  http_request.onreadystatechange = function() { alertGetContents(http_request,opt); };
+  http_request.open('GET',url, true);
+  http_request.send(null);
+ }
+}
+function construct_URL(chk_sql,opt) {
+	 m_send_val = "chksql="+chk_sql+"&rate="+unformat_noobject(document.Form1.RATE.value)+"&value="+unformat_noobject(document.Form1.GROSS_AMOUNT.value)+
+	              "&terms="+document.Form1.PERIOD.value+"&freq="+document.Form1.REPAYMENT_INTERVAL.value+"&type="+document.Form1.PAYMENT_MODE.value+"&option="+opt+
+	              "&last_rent=&sup_cr="+document.Form1.SUPPLIER_CREDIT.value+"&residual="+unformat_noobject(document.Form1.RESIDUAL_VALUE.value)+
+	              "&supcrper=0&cashout="+document.Form1.CASH_OUTFLOW.value+"&trnsub="+document.Form1.TRANSACTION_SUB.value+"&nittype="+document.Form1.INTEREST_TYPE.value+"&nibsm="+unformat_noobject(document.Form1.NIBSM.value)+
+	              "&trn_type="+document.Form1.TRANSACTION_TYPE.value+"&tax="+document.Form1.VAT_PERCENTAGE.value+"&tax_app="+document.Form1.VAT_PER_APP.value+"&installments=";
+	 if(document.Form1.INTEREST_TYPE.value=='VARIABLE'){
+	   m_send_val = m_send_val+"&nitbasemar="+document.Form1.INTEREST_BASE.value+"&nitmar="+document.Form1.INTEREST_MARGIN.value+"";
+	 }else{
+	   m_send_val = m_send_val+"&nitbasemar=&nitmar=";
+	 }
+	 m_fact_val = "";
+	 m_prac_val = "";
+  m_percentage = "";
+  m_char_val = "0";
+  m_main_val = "0";
+  m_mainten  = "";
+  for(i=0;i<parseFloat(document.Form1.hid_count.value);i++){
+    m_send_val   = m_send_val+unformat_noobject(document.Form1.elements["NETAMT"+i].value)+"@";
+    m_fact_val   = m_fact_val+unformat_noobject(document.Form1.elements["FACTOR"+i].value)+"@";
+    m_prac_val   = m_prac_val+unformat_noobject(document.Form1.elements["PRACENT"+i].value)+"@";
+    m_percentage = m_percentage+unformat_noobject(document.Form1.elements["PERCENTAGE"+i].value)+"@";
+	 }
+    m_send_val = m_send_val+"&maintan="+document.Form1.MAINTANENCE.value+"&factor="+m_fact_val+"&pracent="+m_prac_val+"&ami="+document.Form1.AMI.value+"&other_cha="+m_char_val+"&percentage="+m_percentage;
+    return m_send_val;
+	 }
+function alertContents(http_request) {
+ if (http_request.readyState == 4) {
+    if (http_request.status == 200) {
+      alert(http_request.responseText);
+         price_cal.innerHTML=http_request.responseText; 
+         for(i=0;i<10000;i++){o=i;}
+         asign_div();
+    } else {
+        alert('There was a problem with the request.');
+    }
+ }
+}
+function alertGetContents(http_request,opt) {
+ if (http_request.readyState == 4) {
+    if (http_request.status == 200) {
+      if(opt=="2"){
+         Follow_up.innerHTML=''; 
+         Follow_up.innerHTML=http_request.responseText; 
+      }else if(opt=="3"){
+      }
+    } else {
+        Follow_up.innerHTML='';
+    }
+ }
+}
+function asign_div(){
+g_re.innerHTML=document.Form1.sun_g_nt.value
+n_re.innerHTML=document.Form1.sun_rent.value
+p_va.innerHTML=document.Form1.sun_p_nt.value
+m_fact.innerHTML=document.Form1.sun_fact.value
+document.Form1.hid_count.value=document.Form1.hid_cou.value;
+}
+function MyDialog(){
+this.valout   = new Array(10);
+}
+function get_help(Start,End,Hid_No,Crit,Sql,IfCount) {
+oBj = new MyDialog();
+oBj.valout[3]  = " ";
+oBj.valout[4]  = " ";
+oBj.valout[5]  = " ";
+popupwin = window.showModalDialog('https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_MK_Help_Servlet?class_in=LAKDL_AF_MK_help_select&Sql_in='+Sql+'&Start_in='+Start+'&End_in='+End+'&Crit_In='+Crit+'&Hid_No='+Hid_No+'&Max_in='+Hid_No+'&Args=', oBj,"dialogWidth:25em; dialogHeight:26em; center:yes; status:no");
+if(oBj.valout[1]=='Next')  {
+Next(oBj.valout[2],oBj.valout[3],Hid_No,Crit,Sql,IfCount);
+}
+else if  (oBj.valout[1]=='Prev') {
+Prev(oBj.valout[2],oBj.valout[3],Hid_No,Crit,Sql,IfCount);
+}		
+else if(oBj.valout[0] == 'Close'){
+}
+else if(oBj.valout[0] != '' && oBj.valout[1] != '' && oBj.valout[1] != 'undefined'){
+if(IfCount=='1'){
+client_assign(oBj);
+}
+else if(IfCount=='2'){
+modle_assign(oBj);
+}
+else if(IfCount=='3'){
+
+}
+else if(IfCount=='4'){
+vendor_assign(oBj);
+}
+else if(IfCount=='5'){
+mk_trn_assign(oBj);
+}
+else if(IfCount=='6'){
+mk_sub_trn_assign(oBj);
+}
+else if(IfCount=='7'){
+inq_assign(oBj);
+}
+else if(IfCount=='7'){
+price_assign(oBj);
+}
+}
+else if(oBj.valout[4] != " "){ 
+Crit = oBj.valout[4];
+criteria_1('1','10','1',oBj.valout[4],Sql,IfCount);
+}	
+}
+function Prev(Start,End,Hid_No,Crit,Sql,IfCount){
+get_help(Start,End,Hid_No,Crit,Sql,IfCount)
+}
+function Next(Start,End,Hid_No,Crit,Sql,IfCount){
+get_help(Start,End,Hid_No,Crit,Sql,IfCount)
+}
+function criteria_1(Start,End,Hid_No,Crit,Sql,IfCount){
+get_help(Start,End,Hid_No,Crit,Sql,IfCount);
+}
+function model_help(Start,End,Hid_No,Sql,IfCount){
+Crit=document.Form1.ASSET_MAKE.value+"@"+document.Form1.SUB_MODEL.value+"@Y@";
+get_help(Start,End,Hid_No,Crit,Sql,IfCount);
+}
+function modle_assign(oBj){
+ document.Form1.SUB_MODEL.value      =oBj.valout[2]
+ document.Form1.VAT_PERCENTAGE.value =oBj.valout[4]
+ document.Form1.MODEL_CODE.value =oBj.valout[4]
+}
+function vendor_help(Start,End,Hid_No,Sql,IfCount){
+Crit=document.Form1.VENDOR.value+"@Y@";
+get_help(Start,End,Hid_No,Crit,Sql,IfCount);
+}
+function vendor_assign(oBj){
+ document.Form1.VENDOR.value =oBj.valout[2]
+ document.Form1.VENDOR_CODE.value =oBj.valout[1]
+}
+function trn_help(Start,End,Hid_No,Sql,IfCount){
+Crit=document.Form1.TRANSACTION_CODE.value+"@";
+get_help(Start,End,Hid_No,Crit,Sql,IfCount);
+}
+function mk_trn_assign(oBj){
+ document.Form1.TRANSACTION_CODE.value =oBj.valout[2]
+}
+function sub_trn_help(Start,End,Hid_No,Sql,IfCount){
+Crit=document.Form1.TRANSACTION_SUB.value+"@"+document.Form1.TRANSACTION_TYPE.value+"@A@";
+get_help(Start,End,Hid_No,Crit,Sql,IfCount);
+}
+function mk_sub_trn_assign(oBj){
+ document.Form1.TRANSACTION_SUB.value =oBj.valout[2]
+}
+function inq_help(Start,End,Hid_No,Sql,IfCount){
+Crit=document.Form1.INQ_NO.value+"@";
+get_help(Start,End,Hid_No,Crit,Sql,IfCount);
+}
+function inq_assign(oBj){
+ document.Form1.INQ_NO.value =oBj.valout[2]
+}
+function price_help(Start,End,Hid_No,Sql,IfCount){
+Crit=document.Form1.PRICE_NO.value+"@";
+get_help(Start,End,Hid_No,Crit,Sql,IfCount);
+}
+function price_assign(oBj){
+ document.Form1.PRICE_NO.value =oBj.valout[2]
+}
+function change_div(){
+ if(document.Form1.CLIENT_TYPE.options[document.Form1.CLIENT_TYPE.selectedIndex].text!='Individual' &&
+    document.Form1.CONTACT_PERSON.value==''){ 
+   conp.innerHTML="Contact Person *";
+ }else{
+   conp.innerHTML="Contact Person";
+ }
+}
+function change_repay(m_type){
+ if(m_type=='TYPE'){
+    document.Form1.REPAYMENT_INTERVAL.selectedIndex=document.Form1.REPAYMENT_TYPE.selectedIndex 
+ }else{
+    document.Form1.REPAYMENT_TYPE.selectedIndex=document.Form1.REPAYMENT_INTERVAL.selectedIndex 
+ }
+}
+function befor_submit(){
+ m_str='<table><tr><td>Month</td><td>Amount</td></tr>'; 
+ m_cashOAmo ='0'; 
+ m_cash_out =''; 
+ m_cashcount='0'; 
+   for(i=0;i<parseFloat(document.Form1.hid_count.value);i++){
+    if(parseFloat(document.Form1.elements["CASHOUT"+i].value)!=0){
+     m_str      = m_str+'<tr><td><input type=text name="month'+m_cashcount+'"       value='+document.Form1.elements["INSTALLMENT"+i].value+' class="txt_input2" disabled></td>';
+     m_str      = m_str+'    <td><input type=text name="cash_amount'+m_cashcount+'" value='+document.Form1.elements["CASHOUT"+i].value+'     class="txt_input2" disabled></td></tr>';
+     m_cashOAmo = parseFloat(m_cashOAmo)+parseFloat(unformat_noobject(document.Form1.elements["CASHOUT"+i].value));
+     m_cashcount= parseFloat(m_cashcount)+1
+    }
+    m_cash_out   = m_cash_out+unformat_noobject(document.Form1.elements["CASHOUT"+i].value)+"@";
+   }
+	 if(parseFloat(m_cashOAmo)!=parseFloat(document.Form1.GROSS_AMOUNT.value)){
+	   alert('Please Check the Cash Outflow Amounts.');
+	   return false;
+	 }
+	window.opener.document.Form1.CASH_OUTFLOW.value=m_cash_out;
+ m_str = m_str+'</table>'; 
+ window.opener.outflow_id.innerHTML = m_str; 
+ window.opener.document.Form1.CAL_COUNT.value = '1'; 
+ window.opener.document.Form1.OUT_COUNT.value = m_cashcount; 
+ window.close();
+}
+function befor_new(){
+ if(confirm("Are You Sure?")){  
+  document.Form1.OPTION_NAME.value="NEW";
+  document.Form1.OPTION_DESC.value="New";
+ }  
+}
+function befor_back(){
+ if(confirm("Are You Sure?")){  
+  window.close()
+ }  
+}
+function befor_modify(){
+ if(confirm("Are You Sure?")){  
+  document.Form1.OPTION_NAME.value="MOD";
+  document.Form1.OPTION_DESC.value="Edit";
+  document.Form1.PRICE_NO.disabled=false;
+  document.Form1.inqu_help.disabled=false;
+ }  
+}
+function befor_active(){
+ if(confirm("Are You Sure?")){  
+  document.Form1.OPTION_NAME.value="ACT";
+  document.Form1.OPTION_DESC.value="Re-activate";
+  document.Form1.PRICE_NO.disabled=false;
+  document.Form1.inqu_help.disabled=false;
+ }  
+}
+function befor_deactive(){
+ if(confirm("Are You Sure?")){  
+  document.Form1.OPTION_NAME.value="INA";
+  document.Form1.OPTION_DESC.value="De-activate";
+  document.Form1.PRICE_NO.disabled=false;
+  document.Form1.inqu_help.disabled=fales;
+ }  
+}
+function befor_cal(m_stat,opt) {
+  document.Form1.CAL_COUNT.value=0;
+  if(opt=="YES"){
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_MK_Price";
+ }else{
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_MK_Price?chksql=get_basic_price_cal&rate="+unformat_noobject(document.Form1.RATE.value)+"&value="+unformat_noobject(document.Form1.GROSS_AMOUNT.value)+"&terms="+document.Form1.PERIOD.value+"&freq="+document.Form1.REPAYMENT_INTERVAL.value+"&type="+document.Form1.PAYMENT_MODE.value+"&ami="+document.Form1.AMI.value+"&tax="+document.Form1.VAT_PERCENTAGE.value+"&tax_app="+document.Form1.VAT_PER_APP.value+"&last_rent=&nitbasemar="+document.Form1.INTEREST_BASE_MARGIN.value+"&sup_cr="+document.Form1.SUPPLIER_CREDIT.value+"&residual="+unformat_noobject(document.Form1.RESIDUAL_VALUE.value)+"&cashout="+document.Form1.CASH_OUTFLOW.value+"&trnsub="+document.Form1.TRANSACTION_SUB.value+"&nittype="+document.Form1.INTEREST_TYPE.value+"&nibsm="+document.Form1.NIBSM.value+"&trn_type="+document.Form1.TRANSACTION_TYPE.value+"";
+ }
+   m_opt=document.Form1.CACULATED.value;
+   document.Form1.CACULATED.value="YES";
+   makeRequest(m_url,m_stat,opt);
+}
+function load_flow() {
+ if(document.Form1.RATE.value!="" && document.Form1.NET_AMOUNT.value !="" && document.Form1.VAT_PERCENTAGE.value !="" && document.Form1.PERIOD.value !="" && document.Form1.GROSS_AMOUNT.value!=""){
+	 m_fact_val = "";
+	 m_prac_val = "";
+  m_percentage = "";
+  m_char_val = "0";
+  m_main_val = "0";
+  m_mainten  = "";
+  m_cash_out = "";
+  m_cashOAmo = "0";
+  for(i=0;i<parseFloat(document.Form1.hid_count.value);i++){
+    m_send_val   = m_send_val+unformat_noobject(document.Form1.elements["NETAMT"+i].value)+"@";
+    m_fact_val   = m_fact_val+unformat_noobject(document.Form1.elements["FACTOR"+i].value)+"@";
+    m_prac_val   = m_prac_val+unformat_noobject(document.Form1.elements["PRACENT"+i].value)+"@";
+    m_cash_out   = m_cash_out+unformat_noobject(document.Form1.elements["CASHOUT"+i].value)+"@";
+    m_cashOAmo   = parseFloat(m_cashOAmo)+parseFloat(unformat_noobject(document.Form1.elements["CASHOUT"+i].value));
+    m_percentage = m_percentage+unformat_noobject(document.Form1.elements["PERCENTAGE"+i].value)+"@";
+	 }
+	 document.Form1.CASH_OUTFLOW.value=m_cash_out;
+	 window.opener.document.Form1.CASH_OUTFLOW.value=m_cash_out;
+	 if(parseFloat(m_cashOAmo)!=parseFloat(document.Form1.GROSS_AMOUNT.value)){
+	   alert('Please Check the Cash Outflow Amounts.');
+	   return false;
+	 }
+	 m_send_val = "chksql=get_outflow_recal&rate="+unformat_noobject(document.Form1.RATE.value)+"&value="+unformat_noobject(document.Form1.GROSS_AMOUNT.value)+
+	              "&terms="+document.Form1.PERIOD.value+"&freq="+document.Form1.REPAYMENT_INTERVAL.value+"&type="+document.Form1.PAYMENT_MODE.value+"&option="+
+	              "&last_rent=&sup_cr="+document.Form1.SUPPLIER_CREDIT.value+"&residual="+unformat_noobject(document.Form1.RESIDUAL_VALUE.value)+
+	              "&supcrper=0&cashout="+document.Form1.CASH_OUTFLOW.value+"&trnsub="+document.Form1.TRANSACTION_SUB.value+"&nittype="+document.Form1.INTEREST_TYPE.value+"&nibsm="+unformat_noobject(document.Form1.NIBSM.value)+
+	              "&trn_type="+document.Form1.TRANSACTION_TYPE.value+"&tax="+document.Form1.VAT_PERCENTAGE.value+"&tax_app="+document.Form1.VAT_PER_APP.value+"&installments=";
+	 if(document.Form1.INTEREST_TYPE.value=='VARIABLE'){
+	   m_send_val = m_send_val+"&nitbasemar="+document.Form1.INTEREST_BASE.value+"&nitmar="+document.Form1.INTEREST_MARGIN.value+"";
+	 }else{
+	   m_send_val = m_send_val+"&nitbasemar=&nitmar=";
+	 }
+    m_send_val = m_send_val+"&maintan="+m_mainten+"&factor="+m_fact_val+"&pracent="+m_prac_val+"&ami="+document.Form1.AMI.value+"&other_cha="+m_char_val+"&percentage="+m_percentage;
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_MK_Price?"+m_send_val;
+   popupwin = window.open(m_url,'displayWindow1','left=50,top=280,width=900,height=390,toolbar=0,location=0,directories=0,status=0,menuBar=1,scrollBars=1,resizable=1');
+ }else{
+   alert('Please Enter ');
+ }
+}
+function befor_main(m_stat,opt) {
+ if(document.Form1.MAINTENANCE_APP.options[document.Form1.MAINTENANCE_APP.selectedIndex].value!="N"){
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_MK_Price?chksql=loadMaintenance&rate="+unformat_noobject(document.Form1.RATE.value)+"&value="+unformat_noobject(document.Form1.GROSS_AMOUNT.value)+"&terms="+document.Form1.PERIOD.value+"&freq="+document.Form1.REPAYMENT_INTERVAL.value+"&type="+document.Form1.PAYMENT_MODE.value+"&ami="+document.Form1.AMI.value+"&tax="+document.Form1.VAT_PERCENTAGE.value+"&tax_app="+document.Form1.VAT_PER_APP.value+"&last_rent=&nitbasemar="+document.Form1.INTEREST_BASE_MARGIN.value+"&sup_cr="+document.Form1.SUPPLIER_CREDIT.value+"&residual="+unformat_noobject(document.Form1.RESIDUAL_VALUE.value)+"&cashout="+document.Form1.CASH_OUTFLOW.value+"&trnsub="+document.Form1.TRANSACTION_SUB.value+"&nittype="+document.Form1.INTEREST_TYPE.value+"&nibsm="+document.Form1.NIBSM.value+"&trn_type="+document.Form1.TRANSACTION_TYPE.value+"";
+   makeRequest(m_url,"Main",'NO');
+ }else{
+   Follow_up.innerHTML='';;
+ }
+}
+function befor_subtype(m_stat,opt) {
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_MK_Price?chksql=chkSubType&rate="+unformat_noobject(document.Form1.RATE.value)+"&value="+unformat_noobject(document.Form1.GROSS_AMOUNT.value)+"&terms="+document.Form1.PERIOD.value+"&freq="+document.Form1.REPAYMENT_INTERVAL.value+"&type="+document.Form1.TRANSACTION_TYPE.value+"";
+   makeRequest(m_url,"SubType",'NO');
+}
+function befor_end(m_obj) {
+   m_obj.focus();
+}
+function befor_onload(){
+}
+function cal_VatNet(){
+  if(document.Form1.GROSS_AMOUNT.value!="" && document.Form1.VAT_PERCENTAGE.value!=""){
+   document.Form1.NET_AMOUNT.value=format_noobject(parseFloat(unformat_noobject(document.Form1.GROSS_AMOUNT.value))/((parseFloat(unformat_noobject(document.Form1.VAT_PERCENTAGE.value))/100)+1));
+   document.Form1.VAT_AMOUNT.value=format_noobject(parseFloat(unformat_noobject(document.Form1.NET_AMOUNT.value))*(parseFloat(unformat_noobject(document.Form1.VAT_PERCENTAGE.value))/100));
+   document.Form1.GROSS_AMOUNT.value=format_noobject(unformat_noobject(document.Form1.GROSS_AMOUNT.value));
+  }
+}
+function cal_VatGross(){
+  if(document.Form1.NET_AMOUNT.value!="" && document.Form1.VAT_PERCENTAGE.value!=""){
+   document.Form1.GROSS_AMOUNT.value=format_noobject(parseFloat(unformat_noobject(document.Form1.NET_AMOUNT.value))*((parseFloat(unformat_noobject(document.Form1.VAT_PERCENTAGE.value))/100)+1));
+   document.Form1.VAT_AMOUNT.value=format_noobject(parseFloat(unformat_noobject(document.Form1.NET_AMOUNT.value))*(parseFloat(unformat_noobject(document.Form1.VAT_PERCENTAGE.value))/100));
+   document.Form1.NET_AMOUNT.value=format_noobject(unformat_noobject(document.Form1.NET_AMOUNT.value));
+  }
+}
+function load_roll_value(m_val){
+if(m_val==''){
+help_box.innerHTML="Followup - Outstanding Activity Report";
+}else{
+help_box.innerHTML="Followup - Outstanding Activity Report - "+m_val;
+}
+}
+   
+function chan_residual(){
+ if(parseFloat(unformat_noobject(document.Form1.NIBSM.value))>0){
+  document.Form1.RESIDUAL_VALUE.value=format_noobject(document.Form1.NIBSM.value);
+  document.Form1.NIBSM.value=format_noobject(document.Form1.NIBSM.value);
+  document.Form1.RESIDUAL_VALUE.disabled=true;
+ }else{
+  document.Form1.RESIDUAL_VALUE.value='0';
+  document.Form1.RESIDUAL_VALUE.disabled=false;
+ }
+}
+function format_text(obj){
+  obj.value=format_noobject(obj.value);
+}
+function cha_val(count){
+ if(document.Form1.TRANSACTION_SUB.value=="STEP-UP" || document.Form1.TRANSACTION_SUB.value=="STEP-DOWN"){ 
+  if(confirm("Do you want apply this change to all the below installments?")){
+    for(i=parseFloat(count)+1;i<parseFloat(document.Form1.hid_count.value);i++){
+     document.Form1.elements["PERCENTAGE"+i].value = unformat_noobject(document.Form1.elements["PERCENTAGE"+count].value) 
+    }
+  }
+ }
+}
+function cal_count(){
+  document.Form1.CAL_COUNT.value=parseFloat(document.Form1.CAL_COUNT.value)+1;
+}
+function load_fild(){
+ if(document.Form1.INTEREST_TYPE.value=='VARIABLE'){
+   int_type.innerHTML='<table class=table border="0" cellpadding="0" cellspacing="0" width="100%" >'+
+                      '<tr class=tr_input><td width=25%>Variable Interest Base</td>'+
+                      '<td  ><input name="INTEREST_BASE" type="text" maxlength="50" class="txt_input" ></td></tr>'+
+                      '<tr class=tr_input><td >Variable Interest Margin</td>'+
+                      '<td ><input name="INTEREST_MARGIN" type="text" maxlength="50" class="txt_input" ></td></tr></table>';
+ }else{
+   int_type.innerHTML='';
+ }
+}
+function makeRequest(url,opt) {
+var http_request = false;
+if (window.XMLHttpRequest) {
+    http_request = new XMLHttpRequest();
+    if (http_request.overrideMimeType) {
+        http_request.overrideMimeType('text/xml');
+    }
+} else if (window.ActiveXObject) { 
+    try {
+        http_request = new ActiveXObject("Msxml2.XMLHTTP");
+    } catch (e) {
+        try {
+            http_request = new ActiveXObject("Microsoft.XMLHTTP");
+        } catch (e) {}
+    }
+}
+if (!http_request) {
+    alert('Giving up :( Cannot create an XMLHTTP instance');
+    return false;
+}
+ if(opt=='1'){
+  http_request.onreadystatechange = function() { alertContents(http_request); };
+  http_request.open('POST',url, true);
+	 http_request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	 m_send_val = "chksql=get_outflow_recal&rate="+unformat_noobject(document.Form1.RATE.value)+"&value="+unformat_noobject(document.Form1.GROSS_AMOUNT.value)+
+	              "&terms="+document.Form1.PERIOD.value+"&freq="+document.Form1.REPAYMENT_INTERVAL.value+"&type="+document.Form1.PAYMENT_MODE.value+"&option="+
+	              "&last_rent=&sup_cr="+document.Form1.SUPPLIER_CREDIT.value+"&residual="+unformat_noobject(document.Form1.RESIDUAL_VALUE.value)+
+	              "&supcrper=0&cashout="+document.Form1.CASH_OUTFLOW.value+"&trnsub="+document.Form1.TRANSACTION_SUB.value+"&nittype="+document.Form1.INTEREST_TYPE.value+"&nibsm="+unformat_noobject(document.Form1.NIBSM.value)+
+	              "&trn_type="+document.Form1.TRANSACTION_TYPE.value+"&tax="+document.Form1.VAT_PERCENTAGE.value+"&tax_app="+document.Form1.VAT_PER_APP.value+"&installments=";
+  http_request.send(m_send_val);
+ }else{
+  http_request.onreadystatechange = function() { alertGetContents(http_request,opt); };
+  http_request.open('GET',url, true);
+  http_request.send(null);
+ }
+}
+function alertContents(http_request) {
+ if (http_request.readyState == 4) {
+    if (http_request.status == 200) {
+         price_cal.innerHTML=http_request.responseText; 
+    } else {
+        alert('There was a problem with the request.');
+    }
+ }
+}
+function alertGetContents(http_request,opt) {
+ if (http_request.readyState == 4) {
+    if (http_request.status == 200) {
+      if(opt=="2"){
+         Follow_up.innerHTML=http_request.responseText; 
+      }else if(opt=="3"){
+         Curr_no_opts=document.Form1.TRANSACTION_SUB.options;
+         Curr_no_opts.length=0;
+         m_string=http_request.responseText; 
+         m_index =m_string.indexOf("~#@");
+         z=0;
+         while(m_index!=-1){
+           arr_assign[z]  = m_string.substring(0,m_string.indexOf("~#@")); 
+           m_string       = m_string.substring(m_string.indexOf("~#@")+3); 
+           z              = z+1;
+           m_index =m_string.indexOf("~#@");
+         }
+         for(x=0; x<arr_assign.length; x++){
+           m_string1      = arr_assign[x].substring(0,arr_assign[x].indexOf("@#")); 
+           m_string2      = arr_assign[x].substring(arr_assign[x].indexOf("@#")+2); 
+           m_string       = m_string2.substring(0,m_string2.indexOf("@#")); 
+           alert('m_string1='+m_string1+'--m_string='+m_string+'');
+           Curr_no_opts[x]= new Option(m_string,m_string1);
+         }
+      }
+    } else {
+        Follow_up.innerHTML='';
+    }
+ }
+}
+function asign_div(){
+g_re.innerHTML=document.Form1.sun_g_nt.value
+n_re.innerHTML=document.Form1.sun_rent.value
+p_va.innerHTML=document.Form1.sun_p_nt.value
+m_fact.innerHTML=document.Form1.sun_fact.value
+document.Form1.hid_count.value=document.Form1.hid_cou.value;
+}
+function format_text(obj){
+  obj.value=format_noobject(obj.value);
+}
+function load_edit_window(count,fu_no){
+   document.Form1.ROW_ID.value=count;
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Followup?chksql=main_page&Followu_no="+fu_no+"";
+   popupwin = window.open(m_url,'displayWindow1','left=50,top=200,width=900,height=400,toolbar=0,location=0,directories=0,status=0,menuBar=1,scrollBars=1,resizable=1');
+}
+function load_alert(){	
+ if(confirm("Please Read Your Diary and Proceed.")){}
+}	
+function load_all_foll(m_stat,opt) {
+   m_url="https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Followup?chksql=get_followup";
+  setInterval('makeRequest(m_url,"2")',36000);
+}
+function load_data(num) {
+	popupwin = window.open("https://dev-lakdl.sasianet.com:/myserver/servlet/LAKDL_AF_CO_Documents?chksql=get_documents&deal_no="+num+"", "oBj","left=150,top=280,width=520,height=290");
+}
+</Script>
+<body onload="befor_onload();load_alert();load_all_foll('','2');" class="body & txt-body" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<form name="Form1" method=post>
+<input type=hidden name="OPTION_DESC" value=""></td>
+<input type=hidden name="ROW_ID" ></td>
+<table width="100%" class=table border="0" cellspacing="0" cellpadding="0" >
+<tr>
+<td width="1" valign="top"><img src="https://dev-lakdl.sasianet.com/images/spacer.gif" width="8" height="8"></td>
+<td class="border_wht" valign="top"> 
+<table class=table width="100%" border="0" cellspacing="0" cellpadding="0" height="100%">
+<tr> 
+<td height="30" class="pdn_mainHD" class>Asset Financing System Version 1.0</td>
+</tr>
+<tr> 
+<td height="1"><img src="https://dev-lakdl.sasianet.com/images/spacer.gif" width="1" height="1"></td>
+</tr>
+<tr>
+<td style="height: 327px">
+<table class=table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%">   
+<tr>
+<td height="1"><img height="1" src="https://dev-lakdl.sasianet.com/images/spacer.gif" width="1" ></td>
+</tr>
+<tr>
+<td align="left" class="pdn_txtpos2" style="height: 18px" id=help_box>Followup - Outstanding Activity Report</td>
+</tr>
+<tr>
+<td  class="pdn_txtpos" style="height: 28px">
+<table class=table border="0">
+<tr>
+<td class="pdn_txtpos" ><b>OUTSTANDING ACTIVITY REPORT AS AT 28 SEPTEMBER 2006 17:08:13 </b></td>
+</tr>
+<tr class=tr_input>
+<td class="pdn_txtpos"><b>LOGGED USER : OFSCLALL (E03 / BAMBALAPITIYA / MAINTANANCE / - )</b></td></tr>
+</table>
+</td>	
+</tr>
+<tr>
+<td class="line" height="1"><img height="1" src="https://dev-lakdl.sasianet.com/images/spacer.gif" width="1" ></td>
+</tr>
+<tr>
+<td class="pdn_txtpos" height="150" valign="top">
+<table class=table border="0" cellpadding="0" cellspacing="0" width="100%" >
+</table>
+<table class=table border="0" cellpadding="0" cellspacing="0" width="100%" >
+<tr class=tr_input>
+<td valign=top  width=100% Id=Follow_up> 
+<table class=table border='0' width='100%' >
+<tr class=tr_input>
+<td colspan=8 align=right><input type=button name=end_b   value="Go to End" class=mainbut onclick=befor_end(document.Form1.top_b); onMouseOver='load_roll_value("End");' onmouseout='load_roll_value(document.Form1.OPTION_DESC.value);'></td>
+</tr>
+<tr class=pdn_txtpos2>
+<td  width='15%' >Followup No</td>
+<td  width='10%' >Category</td>
+<td  width='15%' >ID No</td>
+<td  width='15%' >Action to be taken</td>
+<td  width='10%' >Effective Date</td>
+<td  width='15%' >Remarks</td>
+<td  width='10%' ></td>
+</tr>
+<tr class=tr_input>
+<td onclick=load_data('-');>FO20060928-0002<input type=hidden name="FollowUp_No_0" value="FO20060928-0002"></td>
+<td onclick=load_data('-');>General</td>
+<td onclick=load_data('-');>-<input type=hidden name="Edit_Type0" ></td>
+<td onclick=load_data('-');>Visit</td>
+<td onclick=load_data('-');>28-09-2006<input type=hidden name="Ent_User_0" value="SHALIKA"></td>
+<td onclick=load_data('-');>Visit HNB </td>
+<td ><input type=button name="Edit_0" value="Edit"   class=mainbut1 onclick=load_edit_window("0","FO20060928-0002","Edit"); >
+     </td>
+</tr>
+<tr class=tr_input>
+<td onclick=load_data('-');>FO20060928-00014<input type=hidden name="FollowUp_No_1" value="FO20060928-00014"></td>
+<td onclick=load_data('-');>General</td>
+<td onclick=load_data('-');>-<input type=hidden name="Edit_Type1" ></td>
+<td onclick=load_data('-');>Call</td>
+<td onclick=load_data('-');>14-09-2006<input type=hidden name="Ent_User_1" value="LAKDLALL"></td>
+<td onclick=load_data('-');>Call Client</td>
+<td ><input type=button name="Edit_1" value="Edit"   class=mainbut1 onclick=load_edit_window("1","FO20060928-00014","Edit"); >
+     </td>
+</tr>
+<tr class=tr_input>
+<td align=right colspan=8><input type=button name=top_b     value="Go to Top" class=mainbut onclick=befor_end(document.Form1.end_b);  onMouseOver='load_roll_value("Top");' onmouseout='load_roll_value(document.Form1.OPTION_DESC.value);'></td>
+</tr></table>
+</td>
+</tr>
+</table>
+</form>
+</body>
+<script language="JavaScript1.2" SRC="https://dev-lakdl.sasianet.com/validate_v1.js"></SCRIPT> 
+</html>
+

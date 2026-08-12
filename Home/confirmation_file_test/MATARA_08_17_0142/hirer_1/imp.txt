@@ -1,0 +1,24 @@
+LAKDL_AF_CR_PRO_Rental_Detail_Report?chksql=DRILL_DOWN_CONTRACT&appl_no=AP20161214-7326
+
+36.034
+
+
+37.028
+
+37.992
+
+
+Shdldh/6/17/1019
+Shpldh/6/17/1019
+
+Milinda
+25075 OFSCL
+25072 MRFFAC
+
+
+Jithendra
+25070 MRFAC
+25032 MRFL
+
+
+
